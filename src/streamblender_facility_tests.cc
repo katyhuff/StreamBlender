@@ -1,58 +1,58 @@
 #include <gtest/gtest.h>
 
-#include "stub_facility.h"
+#include "streamblender_facility.h"
 
 #include "context.h"
 #include "facility_tests.h"
 #include "agent_tests.h"
 
-using stubs::StubFacility;
+using streamblender::StreamblenderFacility;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class StubFacilityTest : public ::testing::Test {
+class StreamblenderFacilityTest : public ::testing::Test {
  protected:
   cyclus::TestContext tc_;
-  StubFacility* src_facility_;
+  StreamblenderFacility* src_facility_;
 
   virtual void SetUp() {
-    src_facility_ = new StubFacility(tc_.get());
+    src_facility_ = new StreamblenderFacility(tc_.get());
   }
 
   virtual void TearDown() {}
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(StubFacilityTest, clone) {
-  StubFacility* cloned_fac =
-      dynamic_cast<StubFacility*> (src_facility_->Clone());
+TEST_F(StreamblenderFacilityTest, clone) {
+  StreamblenderFacility* cloned_fac =
+      dynamic_cast<StreamblenderFacility*> (src_facility_->Clone());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(StubFacilityTest, InitialState) {
+TEST_F(StreamblenderFacilityTest, InitialState) {
   // Test things about the initial state of the facility here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(StubFacilityTest, Print) {
+TEST_F(StreamblenderFacilityTest, Print) {
   EXPECT_NO_THROW(std::string s = src_facility_->str());
-  // Test StubFacility specific aspects of the print method here
+  // Test StreamblenderFacility specific aspects of the print method here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(StubFacilityTest, Tick) {
+TEST_F(StreamblenderFacilityTest, Tick) {
   ASSERT_NO_THROW(src_facility_->Tick());
-  // Test StubFacility specific behaviors of the Tick function here
+  // Test StreamblenderFacility specific behaviors of the Tick function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(StubFacilityTest, Tock) {
+TEST_F(StreamblenderFacilityTest, Tock) {
   EXPECT_NO_THROW(src_facility_->Tock());
-  // Test StubFacility specific behaviors of the Tock function here
+  // Test StreamblenderFacility specific behaviors of the Tock function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Agent* StubFacilityConstructor(cyclus::Context* ctx) {
-  return new StubFacility(ctx);
+cyclus::Agent* StreamblenderFacilityConstructor(cyclus::Context* ctx) {
+  return new StreamblenderFacility(ctx);
 }
 
 // required to get functionality in cyclus agent unit tests library
@@ -63,8 +63,8 @@ static int cyclus_agent_tests_connected = ConnectAgentTests();
 #endif // CYCLUS_AGENT_TESTS_CONNECTED
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-INSTANTIATE_TEST_CASE_P(StubFac, FacilityTests,
-                        ::testing::Values(&StubFacilityConstructor));
+INSTANTIATE_TEST_CASE_P(StreamblenderFac, FacilityTests,
+                        ::testing::Values(&StreamblenderFacilityConstructor));
 
-INSTANTIATE_TEST_CASE_P(StubFac, AgentTests,
-                        ::testing::Values(&StubFacilityConstructor));
+INSTANTIATE_TEST_CASE_P(StreamblenderFac, AgentTests,
+                        ::testing::Values(&StreamblenderFacilityConstructor));

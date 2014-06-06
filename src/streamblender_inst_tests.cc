@@ -2,60 +2,60 @@
 
 #include <string>
 
-#include "stub_inst.h"
+#include "streamblender_inst.h"
 
 #include "institution_tests.h"
 #include "agent_tests.h"
 
-using stubs::StubInst;
+using streamblender::StreamblenderInst;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-class StubInstTest : public ::testing::Test {
+class StreamblenderInstTest : public ::testing::Test {
  protected:
   cyclus::TestContext tc_;
-  StubInst* src_inst_;
+  StreamblenderInst* src_inst_;
 
   virtual void SetUp() {
-    src_inst_ = new StubInst(tc_.get());
+    src_inst_ = new StreamblenderInst(tc_.get());
   }
 
   virtual void TearDown() {}
 };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(StubInstTest, clone) {
-  StubInst* cloned_fac =
-      dynamic_cast<StubInst*> (src_inst_->Clone());
+TEST_F(StreamblenderInstTest, clone) {
+  StreamblenderInst* cloned_fac =
+      dynamic_cast<StreamblenderInst*> (src_inst_->Clone());
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(StubInstTest, InitialState) {
+TEST_F(StreamblenderInstTest, InitialState) {
   // Test things about the initial state of the inst here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(StubInstTest, Print) {
+TEST_F(StreamblenderInstTest, Print) {
   EXPECT_NO_THROW(std::string s = src_inst_->str());
-  // Test StubInst specific aspects of the print method here
+  // Test StreamblenderInst specific aspects of the print method here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(StubInstTest, Tick) {
+TEST_F(StreamblenderInstTest, Tick) {
   int time = 1;
   EXPECT_NO_THROW(src_inst_->Tick());
-  // Test StubInst specific behaviors of the handleTick function here
+  // Test StreamblenderInst specific behaviors of the handleTick function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-TEST_F(StubInstTest, Tock) {
+TEST_F(StreamblenderInstTest, Tock) {
   int time = 1;
   EXPECT_NO_THROW(src_inst_->Tick());
-  // Test StubInst specific behaviors of the handleTock function here
+  // Test StreamblenderInst specific behaviors of the handleTock function here
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Agent* StubInstitutionConstructor(cyclus::Context* ctx) {
-  return new StubInst(ctx);
+cyclus::Agent* StreamblenderInstitutionConstructor(cyclus::Context* ctx) {
+  return new StreamblenderInst(ctx);
 }
 
 // required to get functionality in cyclus agent unit tests library
@@ -66,7 +66,7 @@ static int cyclus_agent_tests_connected = ConnectAgentTests();
 #endif // CYCLUS_AGENT_TESTS_CONNECTED
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-INSTANTIATE_TEST_CASE_P(StubInst, InstitutionTests,
-                        ::testing::Values(&StubInstitutionConstructor));
-INSTANTIATE_TEST_CASE_P(StubInst, AgentTests,
-                        ::testing::Values(&StubInstitutionConstructor));
+INSTANTIATE_TEST_CASE_P(StreamblenderInst, InstitutionTests,
+                        ::testing::Values(&StreamblenderInstitutionConstructor));
+INSTANTIATE_TEST_CASE_P(StreamblenderInst, AgentTests,
+                        ::testing::Values(&StreamblenderInstitutionConstructor));

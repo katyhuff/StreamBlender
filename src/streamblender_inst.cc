@@ -1,20 +1,20 @@
-#include "stub_inst.h"
+#include "streamblender_inst.h"
 
-using stubs::StubInst;
+using streamblender::StreamblenderInst;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubInst::StubInst(cyclus::Context* ctx)
+StreamblenderInst::StreamblenderInst(cyclus::Context* ctx)
     : cyclus::Institution(ctx) {};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubInst::~StubInst() {}
+StreamblenderInst::~StreamblenderInst() {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string StubInst::str() {
+std::string StreamblenderInst::str() {
   return Institution::str();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-extern "C" cyclus::Agent* ConstructStubInst(cyclus::Context* ctx) {
-  return new StubInst(ctx);
+extern "C" cyclus::Agent* ConstructStreamblenderInst(cyclus::Context* ctx) {
+  return new StreamblenderInst(ctx);
 }

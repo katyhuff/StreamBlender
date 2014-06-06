@@ -1,20 +1,20 @@
-#include "stub_region.h"
+#include "streamblender_region.h"
 
-using stubs::StubRegion;
+using streamblender::StreamblenderRegion;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubRegion::StubRegion(cyclus::Context* ctx)
+StreamblenderRegion::StreamblenderRegion(cyclus::Context* ctx)
     : cyclus::Region(ctx) {};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubRegion::~StubRegion() {}
+StreamblenderRegion::~StreamblenderRegion() {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string StubRegion::str() {
+std::string StreamblenderRegion::str() {
   return Region::str();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-extern "C" cyclus::Agent* ConstructStubRegion(cyclus::Context* ctx) {
-  return new StubRegion(ctx);
+extern "C" cyclus::Agent* ConstructStreamblenderRegion(cyclus::Context* ctx) {
+  return new StreamblenderRegion(ctx);
 }

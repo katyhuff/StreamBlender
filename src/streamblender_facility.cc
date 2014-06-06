@@ -1,25 +1,25 @@
-#include "stub_facility.h"
+#include "streamblender_facility.h"
 
-namespace stubs {
+namespace streamblender {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StubFacility::StubFacility(cyclus::Context* ctx)
+StreamblenderFacility::StreamblenderFacility(cyclus::Context* ctx)
     : cyclus::Facility(ctx) {};
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string StubFacility::str() {
+std::string StreamblenderFacility::str() {
   return Facility::str();
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::Tick() {}
+void StreamblenderFacility::Tick() {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StubFacility::Tock() {}
+void StreamblenderFacility::Tock() {}
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-extern "C" cyclus::Agent* ConstructStubFacility(cyclus::Context* ctx) {
-  return new StubFacility(ctx);
+extern "C" cyclus::Agent* ConstructStreamblenderFacility(cyclus::Context* ctx) {
+  return new StreamblenderFacility(ctx);
 }
 
 }
