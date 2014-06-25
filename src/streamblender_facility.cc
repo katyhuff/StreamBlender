@@ -275,13 +275,13 @@ cyclus::toolkit::ResourceBuff StreamblenderFacility::MeetNeed_(int iso, int n){
   std::set<Commodity>::const_iterator pref;
   std::set<Commodity> preflist = prefs(iso);
   for(pref = preflist.begin(); pref != preflist.end(); ++pref){
-      double avail = processing[Ready_()][*pref].quantity();
+      double avail = processing[ready()][*pref].quantity();
       double diff = need - avail;
       if( need > 0 && need > avail ){
-        iso_source_buff.PushAll(processing[Ready_()][*pref].PopQty(avail));
+        iso_source_buff.PushAll(processing[ready()][*pref].PopQty(avail));
         need = diff;
       } else if ( need > 0 && need <= avail ){
-        iso_source_buff.PushAll(processing[Ready_()][*pref].PopQty(need));
+        iso_source_buff.PushAll(processing[ready()][*pref].PopQty(need));
         need = 0;
       }
   }
