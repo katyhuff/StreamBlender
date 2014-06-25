@@ -163,6 +163,9 @@ class StreamblenderFacility : public cyclus::Facility  {
 
   /// @brief Move all unprocessed inventory to processing
   void BeginProcessing_();
+ 
+  /// @brief This part does the blending. 
+  cyclus::toolkit::ResourceBuff MeetNeed_(int iso, int n); 
 
   /// @brief number of possible goal recipes based on the available material
   int NPossible_();
@@ -223,6 +226,7 @@ class StreamblenderFacility : public cyclus::Facility  {
   #pragma cyclus var {"tooltip":"output recipe",\
                       "doc":"recipe produced by this facility"}
   std::string out_recipe_;
+  inline std::string out_recipe() const {return out_recipe_;};
 
   #pragma cyclus var {"default": 0,\
                       "tooltip":"process time (timesteps)",\

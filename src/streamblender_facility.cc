@@ -264,6 +264,30 @@ void StreamblenderFacility::BeginProcessing_(){
     }
   }
 }
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+cyclus::toolkit::ResourceBuff StreamblenderFacility::MeetNeed_(int iso, int n){
+  using cyclus::toolkit::ResourceBuff;
+  using cyclus::toolkit::Commodity;
+
+  ResourceBuff iso_source_buff =  ResourceBuff();
+  double need = n*GoalCompMap_()[iso];
+  std::set<Commodity>::const_iterator pref;
+  std::set<Commodity> preflist = prefs(iso);
+  for(pref = preflist.begin(); pref != preflist.end(); ++pref){
+      double avail = processing[Ready_()][*pref].quantity();
+      double diff = need - avail;
+      if( need > 0 && need > avail ){
+        iso_source_buff.PushAll(processing[Ready_()][*pref].PopQty(avail));
+        need = diff;
+      } else if ( need > 0 && need <= avail ){
+        iso_source_buff.PushAll(processing[Ready_()][*pref].PopQty(need));
+        need = 0;
+      }
+  }
+  return iso_source_buff;
+}
+
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int StreamblenderFacility::NPossible_(){
   using cyclus::toolkit::Commodity;
@@ -375,6 +399,7 @@ std::set<cyclus::toolkit::Commodity> StreamblenderFacility::prefs(int iso){
 void StreamblenderFacility::BlendStreams_(){
   using cyclus::Material;
   using cyclus::toolkit::ResourceBuff;
+  using cyclus::toolkit::Commodity;
 
   int n = NPossible_();
   if( n > 0 ){
