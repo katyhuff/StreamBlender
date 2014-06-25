@@ -168,7 +168,7 @@ class StreamblenderFacility : public cyclus::Facility  {
   int NPossible_();
 
   /// @brief collapse a resourcebuff into a single material
-  cyclus::Material CollapseBuff(cyclus::toolkit::ResourceBuff to_collapse);
+  cyclus::Material::Ptr CollapseBuff(cyclus::toolkit::ResourceBuff to_collapse);
 
   /// @brief move a resourcebuff of blended materials into the stocks
   void MoveToStocks_(cyclus::toolkit::ResourceBuff blended_buff, int n_poss);

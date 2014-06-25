@@ -81,9 +81,9 @@ StreamblenderFacility::GetMatlRequests() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StreamblenderFacility::AcceptMatlTrades(
-  using cyclus::toolkit::Commodity;
   const std::vector< std::pair<cyclus::Trade<cyclus::Material>,
   cyclus::Material::Ptr> >& responses) {
+  using cyclus::toolkit::Commodity;
   using cyclus::Material;
 
   std::map<Commodity, Material::Ptr> mat_commods;
@@ -267,6 +267,7 @@ void StreamblenderFacility::BeginProcessing_(){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int StreamblenderFacility::NPossible_(){
   using cyclus::toolkit::Commodity;
+
   bool first_run = true;
   int n_poss = 0;
   int prev = 0;
@@ -279,11 +280,11 @@ int StreamblenderFacility::NPossible_(){
     std::set<Commodity>::const_iterator pref;
     std::set<Commodity> preflist = prefs(iso);
     for(pref = preflist.begin(); pref != preflist.end(); ++pref){
-      std::map< Commodity, cyclus::ResourceBuff >::iterator found;
-      found = processing_[Ready_()].find(*pref);
-      bool isfound = (found!=processing_[Ready_()].end());
+      std::map< Commodity, cyclus::toolkit::ResourceBuff >::iterator found;
+      found = processing[ready()].find(*pref);
+      bool isfound = (found!=processing[ready()].end());
       if(isfound){
-        avail += processing_[Ready_()][*pref].quantity();
+        avail += processing[ready()][*pref].quantity();
       }
     }
     int curr = int(std::floor(avail/amt));
@@ -299,8 +300,8 @@ int StreamblenderFacility::NPossible_(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Material::Ptr StreamblenderFacility::CollapseBuff(cyclus::ResourceBuff to_collapse){
-  using cyclus::Manifest;
+cyclus::Material::Ptr StreamblenderFacility::CollapseBuff(cyclus::toolkit::ResourceBuff to_collapse){
+  using cyclus::toolkit::Manifest;
   using cyclus::Material;
   using cyclus::ResCast;
   double qty =  to_collapse.quantity();
@@ -317,8 +318,9 @@ cyclus::Material::Ptr StreamblenderFacility::CollapseBuff(cyclus::ResourceBuff t
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StreamblenderFacility::MoveToStocks_(cyclus::ResourceBuff fabbed_fuel_buff, int n_poss){
-  using cyclus::Manifest;
+void StreamblenderFacility::MoveToStocks_(cyclus::toolkit::ResourceBuff fabbed_fuel_buff, int n_poss){
+  using cyclus::toolkit::Manifest;
+  using cyclus::toolkit::Commodity;
   using cyclus::Material;
   using cyclus::ResCast;
 
@@ -326,12 +328,12 @@ void StreamblenderFacility::MoveToStocks_(cyclus::ResourceBuff fabbed_fuel_buff,
 
   for( int i=0; i<n_poss; ++i){
     Material::Ptr goal_mat =  soup->ExtractComp(GoalCompMass_(), GoalComp_());
-    std::map< Commodity, cyclus::ResourceBuff >::const_iterator found;
-    found = stocks_.find(out_commod());
-    if( found == stocks_.end() ) {
-      stocks_[out_commod()] = cyclus::ResourceBuff();
+    std::map< Commodity, cyclus::toolkit::ResourceBuff >::const_iterator found;
+    found = stocks.find(out_commod());
+    if( found == stocks.end() ) {
+      stocks[out_commod()] = cyclus::toolkit::ResourceBuff();
     }
-    stocks_[out_commod()].Push(goal_mat);
+    stocks[out_commod()].Push(goal_mat);
   }
 }
 
@@ -360,6 +362,7 @@ double StreamblenderFacility::GoalCompMass_(){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<cyclus::toolkit::Commodity> StreamblenderFacility::prefs(int iso){
   using cyclus::toolkit:Commodity;
+
   std::set<Commodity> preflist;
   std::map<int, std::set<Commodity> >::const_iterator it;
   it = prefs_.find(iso);
@@ -376,7 +379,7 @@ std::set<cyclus::toolkit::Commodity> StreamblenderFacility::prefs(int iso){
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StreamblenderFacility::BlendStreams_(){
   using cyclus::Material;
-  using cyclus::ResourceBuff;
+  using cyclus::toolkit::ResourceBuff;
 
   int n = NPossible_();
   if( n > 0 ){
@@ -399,6 +402,7 @@ void StreamblenderFacility::BlendStreams_(){
 const double StreamblenderFacility::inventory_quantity(cyclus::toolkit::Commodity commod)const {
   using cyclus::toolkit::Commodity;
   using cyclus::toolkit::ResourceBuff;
+
   std::map<Commodity, ResourceBuff>::const_iterator found;
   found = inventory.find(commod);
   double amt;
@@ -414,6 +418,7 @@ const double StreamblenderFacility::inventory_quantity(cyclus::toolkit::Commodit
 const double StreamblenderFacility::inventory_quantity() const {
   using cyclus::toolkit::Commodity;
   using cyclus::toolkit::ResourceBuff;
+
   double total = 0;
   std::map<Commodity, ResourceBuff>::const_iterator it;
   for( it = inventory.begin(); it != inventory.end(); ++it) {
