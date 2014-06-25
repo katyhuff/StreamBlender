@@ -42,16 +42,16 @@ std::string StreamblenderFacility::str() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StreamblenderFacility::Tick() {
-  LOG(cyclus::LEV_INFO3, "ComCnv") << prototype() << " is ticking {";
-  LOG(cyclus::LEV_INFO3, "ComCnv") << "}";
+  LOG(cyclus::LEV_INFO3, "SBlend") << prototype() << " is ticking {";
+  LOG(cyclus::LEV_INFO3, "SBlend") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StreamblenderFacility::Tock() {
-  LOG(cyclus::LEV_INFO3, "ComCnv") << prototype() << " is tocking {";
+  LOG(cyclus::LEV_INFO3, "SBlend") << prototype() << " is tocking {";
   BlendStreams_(); // blend streams to make the most possible GoalMat with ready mats
   BeginProcessing_(); // place unprocessed inventory into processing
-  LOG(cyclus::LEV_INFO3, "ComCnv") << "}";
+  LOG(cyclus::LEV_INFO3, "SBlend") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -148,7 +148,7 @@ void StreamblenderFacility::GetMatlTrades(
     Material::Ptr response = TradeResponse_(qty, &stocks);
 
     responses.push_back(std::make_pair(*it, response));
-    LOG(cyclus::LEV_INFO5, "ComCnv") << prototype()
+    LOG(cyclus::LEV_INFO5, "SBlend") << prototype()
                                   << " just received an order"
                                   << " for " << it->amt
                                   << " of " << commodity;
@@ -160,7 +160,7 @@ void StreamblenderFacility::GetMatlTrades(
 void StreamblenderFacility::AddMat_(cyclus::toolkit::Commodity commod, 
     cyclus::Material::Ptr mat) {
 
-  LOG(cyclus::LEV_INFO5, "ComCnv") << prototype() << " is initially holding "
+  LOG(cyclus::LEV_INFO5, "SBlend") << prototype() << " is initially holding "
                                 << inventory_quantity() << " total.";
 
   try {
@@ -170,7 +170,7 @@ void StreamblenderFacility::AddMat_(cyclus::toolkit::Commodity commod,
     throw e;
   }
 
-  LOG(cyclus::LEV_INFO5, "ComCnv") << prototype() << " added " << mat->quantity()
+  LOG(cyclus::LEV_INFO5, "SBlend") << prototype() << " added " << mat->quantity()
                                 << " of " << in_commod()
                                 << " to its inventory, which is holding "
                                 << inventory_quantity() << " total.";
@@ -250,7 +250,7 @@ cyclus::Material::Ptr StreamblenderFacility::TradeResponse_(
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StreamblenderFacility::BeginProcessing_(){
-  LOG(cyclus::LEV_DEBUG2, "ComCnv") << "CommodConverter " << prototype()
+  LOG(cyclus::LEV_DEBUG2, "SBlend") << "CommodConverter " << prototype()
                                     << " added resources to processing";
   std::map<cyclus::toolkit::Commodity, cyclus::toolkit::ResourceBuff>::iterator it;
   for (it = inventory.begin(); it != inventory.end(); ++it){
@@ -389,7 +389,8 @@ void StreamblenderFacility::BlendStreams_(){
     }
 
     MoveToStocks_(fabbed_fuel_buff, n);
-    LOG(cyclus::LEV_DEBUG2, "FCOFF") << "StreamblenderFacility " << name() << " is fabricating fuel.";
+    LOG(cyclus::LEV_DEBUG2, "SBlend") << "StreamblenderFacility " << prototype() 
+                                     << " is blending streams.";
   }
 }
 
