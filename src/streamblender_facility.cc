@@ -334,6 +334,19 @@ void StreamblenderFacility::MoveToStocks_(cyclus::ResourceBuff fabbed_fuel_buff,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::set<std::string> StreamblenderFacility::prefs(int iso){
+  std::set<std::string> preflist;
+  std::map<int, std::set<std::string > >::const_iterator it;
+  it = prefs_.find(iso);
+  if(it != prefs_.end()){
+    preflist = it->second;
+  } else {
+    throw cyclus::ValueError("Invalid pref iso. There is no source named for this iso.");
+  }
+  return preflist;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StreamblenderFacility::BlendStreams_(){
   using cyclus::Material;
   using cyclus::ResourceBuff;
