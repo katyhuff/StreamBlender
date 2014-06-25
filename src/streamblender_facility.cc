@@ -328,12 +328,7 @@ void StreamblenderFacility::MoveToStocks_(cyclus::toolkit::ResourceBuff fabbed_f
 
   for( int i=0; i<n_poss; ++i){
     Material::Ptr goal_mat =  soup->ExtractComp(GoalCompMass_(), GoalComp_());
-    std::map< Commodity, cyclus::toolkit::ResourceBuff >::const_iterator found;
-    found = stocks.find(out_commod());
-    if( found == stocks.end() ) {
-      stocks[out_commod()] = cyclus::toolkit::ResourceBuff();
-    }
-    stocks[out_commod()].Push(goal_mat);
+    stocks.Push(goal_mat);
   }
 }
 
@@ -361,7 +356,7 @@ double StreamblenderFacility::GoalCompMass_(){
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<cyclus::toolkit::Commodity> StreamblenderFacility::prefs(int iso){
-  using cyclus::toolkit:Commodity;
+  using cyclus::toolkit::Commodity;
 
   std::set<Commodity> preflist;
   std::map<int, std::set<Commodity> >::const_iterator it;

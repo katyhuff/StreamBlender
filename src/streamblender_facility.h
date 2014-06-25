@@ -240,6 +240,9 @@ class StreamblenderFacility : public cyclus::Facility  {
   cyclus::toolkit::ResourceBuff stocks;
   cyclus::toolkit::ResourceBuff wastes;
 
+  /// @brief a list of preffered commodities
+  std::map<int, cyclus::toolkit::Commodity> prefs_;
+
   /// @brief map from ready time to resource buffers
   std::map<int, std::map<cyclus::toolkit::Commodity, 
     cyclus::toolkit::ResourceBuff> > processing;
