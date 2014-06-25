@@ -141,9 +141,10 @@ class StreamblenderFacility : public cyclus::Facility  {
   /* --- */
 
  protected:
-  ///   @brief adds a material into the incoming commodity inventory
-  ///   @throws if the material is not the same composition as the in_recipe
-  void AddMat_(cyclus::Material::Ptr mat);
+  /// @brief adds a material into the incoming commodity inventory
+  /// @param commod the commodity name associated with the material
+  /// @param mat the material that is incoming.  
+  void AddMat_(cyclus::toolkit::Commodity commod, cyclus::Material::Ptr mat);
 
   ///   @brief generates a request for this facility given its current state. The
   ///   quantity of the material will be equal to the remaining inventory size.
@@ -163,8 +164,23 @@ class StreamblenderFacility : public cyclus::Facility  {
   /// @brief Move all unprocessed inventory to processing
   void BeginProcessing_();
 
-  /// @brief Convert one ready resource in processing
-  void Convert_();
+  /// @brief number of possible goal recipes based on the available material
+  int NPossible_();
+
+  /// @brief collapse a resourcebuff into a single material
+  cyclus::Material CollapseBuff(cyclus::toolkit::ResourceBuff to_collapse);
+
+  /// @brief move a resourcebuff of blended materials into the stocks
+  void MoveToStocks_(cyclus::toolkit::ResourceBuff blended_buff, int n_poss);
+
+  /// @brief make as much of the goal mat as possible with ready materials.
+  void BlendStreams_();
+
+  /// @brief gives current quantity of commod in inventory
+  const double inventory_quantity(cyclus::toolkit::Commodity commod) const;
+
+  /// @brief gives current quantity of all commods in inventory
+  const double inventory_quantity() const;
 
   /// @brief this facility's commodity-recipe context
   inline void crctx(const cyclus::toolkit::CommodityRecipeContext& crctx) {
@@ -208,11 +224,13 @@ class StreamblenderFacility : public cyclus::Facility  {
   double max_inv_size_; //should be nonnegative
 
   #pragma cyclus var{'capacity': 'max_inv_size_'}
-  cyclus::toolkit::ResourceBuff inventory;
+  std::map<cyclus::toolkit::Commodity, cyclus::toolkit::ResourceBuff> inventory;
   cyclus::toolkit::ResourceBuff stocks;
+  cyclus::toolkit::ResourceBuff wastes;
 
   /// @brief map from ready time to resource buffers
-  std::map<int, cyclus::toolkit::ResourceBuff> processing;
+  std::map<int, std::map<cyclus::toolkit::Commodity, 
+    cyclus::toolkit::ResourceBuff> > processing;
 
   cyclus::toolkit::CommodityRecipeContext crctx_;
 
@@ -226,9 +244,8 @@ class StreamblenderFacility : public cyclus::Facility  {
 
   /// @brief current maximum amount that can be added to processing
   inline double current_capacity() const {
-    return max_inv_size_ - inventory.quantity(); } 
+    return (max_inv_size_ - inventory_quantity()); } 
   
-  ///
   friend class StreamblenderFacilityTest;
 };
 
