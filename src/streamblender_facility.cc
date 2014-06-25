@@ -81,17 +81,18 @@ StreamblenderFacility::GetMatlRequests() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StreamblenderFacility::AcceptMatlTrades(
+  using cyclus::toolkit::Commodity;
   const std::vector< std::pair<cyclus::Trade<cyclus::Material>,
   cyclus::Material::Ptr> >& responses) {
   using cyclus::Material;
 
-  std::map<std::string, Material::Ptr> mat_commods;
+  std::map<Commodity, Material::Ptr> mat_commods;
 
   std::vector< std::pair<cyclus::Trade<cyclus::Material>,
                          cyclus::Material::Ptr> >::const_iterator trade;
 
   // blob each material by commodity
-  std::string commod;
+  Commodity commod;
   Material::Ptr mat;
   for (trade = responses.begin(); trade != responses.end(); ++trade) {
     commod = trade->first.request->commodity();
@@ -104,7 +105,7 @@ void StreamblenderFacility::AcceptMatlTrades(
   }
 
   // add each blob to reserves
-  std::map<std::string, Material::Ptr>::iterator it;
+  std::map<Commodity, Material::Ptr>::iterator it;
   for (it = mat_commods.begin(); it != mat_commods.end(); ++it) {
     AddMat_(it->first, it->second);
   }
@@ -265,6 +266,7 @@ void StreamblenderFacility::BeginProcessing_(){
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 int StreamblenderFacility::NPossible_(){
+  using cyclus::toolkit::Commodity;
   bool first_run = true;
   int n_poss = 0;
   int prev = 0;
@@ -274,10 +276,10 @@ int StreamblenderFacility::NPossible_(){
     int iso = it->first;
     double amt = it->second;
     double avail = 0;
-    std::set<std::string>::const_iterator pref;
-    std::set<std::string> preflist = prefs(iso);
+    std::set<Commodity>::const_iterator pref;
+    std::set<Commodity> preflist = prefs(iso);
     for(pref = preflist.begin(); pref != preflist.end(); ++pref){
-      std::map< std::string, cyclus::ResourceBuff >::iterator found;
+      std::map< Commodity, cyclus::ResourceBuff >::iterator found;
       found = processing_[Ready_()].find(*pref);
       bool isfound = (found!=processing_[Ready_()].end());
       if(isfound){
@@ -324,7 +326,7 @@ void StreamblenderFacility::MoveToStocks_(cyclus::ResourceBuff fabbed_fuel_buff,
 
   for( int i=0; i<n_poss; ++i){
     Material::Ptr goal_mat =  soup->ExtractComp(GoalCompMass_(), GoalComp_());
-    std::map< std::string, cyclus::ResourceBuff >::const_iterator found;
+    std::map< Commodity, cyclus::ResourceBuff >::const_iterator found;
     found = stocks_.find(out_commod());
     if( found == stocks_.end() ) {
       stocks_[out_commod()] = cyclus::ResourceBuff();
@@ -356,9 +358,10 @@ double StreamblenderFacility::GoalCompMass_(){
   return amt;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::set<std::string> StreamblenderFacility::prefs(int iso){
-  std::set<std::string> preflist;
-  std::map<int, std::set<std::string > >::const_iterator it;
+std::set<cyclus::toolkit::Commodity> StreamblenderFacility::prefs(int iso){
+  using cyclus::toolkit:Commodity;
+  std::set<Commodity> preflist;
+  std::map<int, std::set<Commodity> >::const_iterator it;
   it = prefs_.find(iso);
   if(it != prefs_.end()){
     preflist = it->second;
@@ -377,7 +380,7 @@ void StreamblenderFacility::BlendStreams_(){
 
   int n = NPossible_();
   if( n > 0 ){
-    std::map< int, std::set<std::string> >::const_iterator pref;
+    std::map< int, std::set<Commodity> >::const_iterator pref;
     ResourceBuff fabbed_fuel_buff;
 
     for(pref = prefs_.begin(); pref != prefs_.end(); ++pref){
