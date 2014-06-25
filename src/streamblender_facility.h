@@ -16,21 +16,69 @@ namespace streamblender {
 /// The StreamblenderFacility class inherits from the Facility class and is
 /// dynamically loaded by the Agent class when requested.
 ///
-/// @section intro Introduction
-/// Place an introduction to the agent here.
+/// @section introduction Introduction
+/// The StreamBlender is a facility that receives commodities, holds onto them
+/// for some number of months, offers them to the market of the new commodity. It
+/// has three  stocks areas which hold commods of commodities: reserves,
+/// processing, and  stocks. Incoming commodity orders are placed into reserves,
+/// from which the  processing area is populated. When a process (some number of
+/// months spent waiting)  has been completed, the commodity is converted and
+/// moved into stocks. Requests for  commodities are bid upon based on the state
+/// of the commodities in the stocks.
 ///
 /// @section agentparams Agent Parameters
 /// Place a description of the required input parameters which define the
 /// agent implementation.
+///   #. process_time : the number of timesteps a conversion process takes <0>
+///   #. refuel_time : the number of timesteps required to reload the processing after
+///   a process has finished <0>
+///
+/// The StreamBlender also maintains a cyclus::CommodityRecipeContext, which
+/// allows it to track incommodity-inrecipe/outcommodity-outrecipe groupings.
 ///
 /// @section optionalparams Optional Parameters
 /// Place a description of the optional input parameters to define the
 /// agent implementation.
 ///
 /// @section detailed Detailed Behavior
-/// Place a description of the detailed behavior of the agent. Consider
-/// describing the behavior at the tick and tock as well as the behavior
-/// upon sending and receiving materials and messages.
+/// After a StreamBlender enters the simulation, it will begin requesting all
+/// incommodities.
+///
+/// As soon as it receives a commodity, that commodity is placed in the
+/// processing storage area.
+///
+/// On the tick of the timestep in which that incommodity's time is up, it is
+/// converted to the outcommodity type, by simply changing the commodity name.
+/// Then, it is offered to the  outcommodity market.
+///
+/// The StreamBlender can manage multiple input-output commodity pairs, and keeps
+/// track of the pair that each resource belongs to. Resources move through the
+/// system independently of their input/output commodity types, but when they
+/// reach the stocks area, they are offered as bids depedent on their output
+/// commodity type.
+///
+/// @section requests Requests
+/// A StreamBlender will make as many requests as it has possible input
+/// commodities. It provides a constraint based on a total request amount
+/// determined by its processing capacity.
+///
+/// @section bids Bids
+/// A StreamBlender will bid on any request for any of its out_commodities, as
+/// long as there is a positive quantity of material in its stocks area
+/// associated with that output commodity.
+///
+/// @section ics Initial Conditions
+/// A StreamBlender can be deployed with any number of commods in its reserve,
+/// processing, and stocks buffers. Recipes and commodities for each of these
+/// groupings must be specified.
+///
+/// @todo add decommissioning behavior if material is still in stocks
+///
+/// @section end End of Life
+/// If the current time step is equivalent to the facility's lifetime, the
+/// reactor will move all material in its processing to its stocks containers,
+/// converted or not.
+///
 class StreamblenderFacility : public cyclus::Facility  {
  public:  
   /// Constructor for StreamblenderFacility Class
