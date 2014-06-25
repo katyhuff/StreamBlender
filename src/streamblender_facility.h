@@ -43,10 +43,11 @@ class StreamblenderFacility : public cyclus::Facility  {
   /// @warning The Prime Directive must have a space before it! (A fix will be
   /// in 2.0 ^TM)
   
-  #pragma cyclus
+  #pragma cyclus decl
 
-  #pragma cyclus note {"doc": "A streamblender facility is provided as a skeleton " \
-                              "for the design of new facility agents."}
+  #pragma cyclus note {"doc": "A streamblender facility blends incoming streams "\
+                              "of material into a goal recipe, by order of "\
+                              "commodity  preference. Useful for Fuel Fabrication."}
 
   /// A verbose printer for the StreamblenderFacility
   virtual std::string str();
@@ -59,7 +60,128 @@ class StreamblenderFacility : public cyclus::Facility  {
   /// @param time the time of the tock
   virtual void Tock();
 
-  // and away we go!
+  /// @brief The StreamblenderFacility requests materials
+  virtual std::set<cyclus::RequestPortfolio<cyclus::Material>::Ptr> GetMatlRequests();
+
+  /// @brief The StreamblenderFacility places accepted trade Materials in their
+  /// Inventory
+  virtual void AcceptMatlTrades(
+      const std::vector< std::pair<cyclus::Trade<cyclus::Material>,
+      cyclus::Material::Ptr> >& responses);
+
+  /// @brief Responds to each request for this facility's commodity.  If a given
+  /// request is more than this facility's inventory capacity, it will
+  /// offer its minimum of its capacities.
+  virtual std::set<cyclus::BidPortfolio<cyclus::Material>::Ptr>
+      GetMatlBids(cyclus::CommodMap<cyclus::Material>::type&
+                  commod_requests);
+
+  /// @brief respond to each trade with a material enriched to the appropriate
+  /// level given this facility's inventory
+  ///
+  /// @param trades all trades in which this trader is the supplier
+  /// @param responses a container to populate with responses to each trade
+  virtual void GetMatlTrades(
+    const std::vector< cyclus::Trade<cyclus::Material> >& trades,
+    std::vector<std::pair<cyclus::Trade<cyclus::Material>,
+    cyclus::Material::Ptr> >& responses);
+
+  /* --- */
+
+  /* --- StreamblenderFacility Members --- */
+
+  /* --- */
+
+ protected:
+  ///   @brief adds a material into the incoming commodity inventory
+  ///   @throws if the material is not the same composition as the in_recipe
+  void AddMat_(cyclus::Material::Ptr mat);
+
+  ///   @brief generates a request for this facility given its current state. The
+  ///   quantity of the material will be equal to the remaining inventory size.
+  cyclus::Material::Ptr Request_();
+
+  /// @brief gathers information about bids
+  cyclus::BidPortfolio<cyclus::Material>::Ptr GetBids_(
+        cyclus::CommodMap<cyclus::Material>::type& commod_requests,
+        std::string commod,
+        cyclus::toolkit::ResourceBuff* buffer);
+
+  /// @brief suggests, based on the buffer, a material response to an offer
+  cyclus::Material::Ptr TradeResponse_(
+      double qty,
+      cyclus::toolkit::ResourceBuff* buffer);
+
+  /// @brief Move all unprocessed inventory to processing
+  void BeginProcessing_();
+
+  /// @brief Convert one ready resource in processing
+  void Convert_();
+
+  /// @brief this facility's commodity-recipe context
+  inline void crctx(const cyclus::toolkit::CommodityRecipeContext& crctx) {
+    crctx_ = crctx;
+  }
+  inline cyclus::toolkit::CommodityRecipeContext crctx() const {
+    return crctx_;
+  }
+
+  /// @brief returns the time key for ready materials
+  int ready(){ return context()->time() - process_time_ ; }
+
+  /* --- Module Members --- */
+  #pragma cyclus var {"tooltip":"input commodity",\
+                      "doc":"commodity accepted by this facility"}
+  std::string in_commod_;
+  inline std::string in_commod() const {return in_commod_;};
+
+  #pragma cyclus var {"tooltip":"output commodity",\
+                      "doc":"commodity produced by this facility"}
+  std::string out_commod_;
+  inline std::string out_commod() const {return out_commod_;};
+
+  #pragma cyclus var {"tooltip":"input recipe",\
+                      "doc":"recipe accepted by this facility"}
+  std::string in_recipe_;
+
+  #pragma cyclus var {"tooltip":"output recipe",\
+                      "doc":"recipe produced by this facility"}
+  std::string out_recipe_;
+
+  #pragma cyclus var {"default": 0,\
+                      "tooltip":"process time (timesteps)",\
+                      "doc":"the time it takes to convert a received commodity (timesteps)."}
+  int process_time_; //should be nonnegative
+
+  #pragma cyclus var {"default": 1e299,\
+                      "tooltip":"maximum inventory size (kg)",\
+                      "doc":"the amount of material that can be in storage at "\
+                      "one time (kg)."}
+  double max_inv_size_; //should be nonnegative
+
+  #pragma cyclus var{'capacity': 'max_inv_size_'}
+  cyclus::toolkit::ResourceBuff inventory;
+  cyclus::toolkit::ResourceBuff stocks;
+
+  /// @brief map from ready time to resource buffers
+  std::map<int, cyclus::toolkit::ResourceBuff> processing;
+
+  cyclus::toolkit::CommodityRecipeContext crctx_;
+
+  /// @brief the processing time required for a full process
+  inline void process_time(int t) { process_time_ = t; }
+  inline int process_time() const { return process_time_; }
+
+  /// @brief the maximum amount allowed in inventory
+  inline void capacity(double c) { max_inv_size_ = c; }
+  inline double capacity() const { return max_inv_size_; }
+
+  /// @brief current maximum amount that can be added to processing
+  inline double current_capacity() const {
+    return max_inv_size_ - inventory.quantity(); } 
+  
+  ///
+  friend class StreamblenderFacilityTest;
 };
 
 }  // namespace streamblender
