@@ -334,6 +334,28 @@ void StreamblenderFacility::MoveToStocks_(cyclus::ResourceBuff fabbed_fuel_buff,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+cyclus::Composition::Ptr StreamblenderFacility::GoalComp_(){
+  std::string out = out_recipe();
+  cyclus::Composition::Ptr recipe = context()->GetRecipe(out_recipe());
+  return recipe;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+cyclus::CompMap StreamblenderFacility::GoalCompMap_(){
+  return GoalComp_()->mass();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double StreamblenderFacility::GoalCompMass_(){
+  double amt = 0;
+  std::map<int, double>::const_iterator it;
+  cyclus::CompMap goal = GoalCompMap_();
+  for(it=goal.begin(); it!=goal.end(); ++it){
+    amt += it->second;
+  }
+  return amt;
+}
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<std::string> StreamblenderFacility::prefs(int iso){
   std::set<std::string> preflist;
   std::map<int, std::set<std::string > >::const_iterator it;
@@ -341,7 +363,9 @@ std::set<std::string> StreamblenderFacility::prefs(int iso){
   if(it != prefs_.end()){
     preflist = it->second;
   } else {
-    throw cyclus::ValueError("Invalid pref iso. There is no source named for this iso.");
+    std::stringstream ss;
+    ss << "Invalid pref. No source is named for iso: " << iso ;
+    throw cyclus::ValueError(ss.str());
   }
   return preflist;
 }

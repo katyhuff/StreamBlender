@@ -173,6 +173,18 @@ class StreamblenderFacility : public cyclus::Facility  {
   /// @brief move a resourcebuff of blended materials into the stocks
   void MoveToStocks_(cyclus::toolkit::ResourceBuff blended_buff, int n_poss);
 
+  /// @brief calculates the total mass of the goal material composition [kg]
+  double GoalCompMass_();
+
+  /// @brief calculates goal material composition
+  cyclus::CompMap GoalCompMap_();
+
+  /// @brief calculates goal material composition
+  cyclus::Composition::Ptr GoalComp_();
+
+  /// @brief returns the preferred commodity sources for the isotope, iso
+  std::set<cyclus::toolkit::Commodity> prefs(int iso);
+
   /// @brief make as much of the goal mat as possible with ready materials.
   void BlendStreams_();
 
