@@ -144,7 +144,7 @@ class StreamblenderFacility : public cyclus::Facility  {
   /// @brief adds a material into the incoming commodity inventory
   /// @param commod the commodity name associated with the material
   /// @param mat the material that is incoming.  
-  void AddMat_(cyclus::toolkit::Commodity commod, cyclus::Material::Ptr mat);
+  void AddMat_(std::string commod, cyclus::Material::Ptr mat);
 
   ///   @brief generates a request for this facility given its current state. The
   ///   quantity of the material will be equal to the remaining inventory size.
@@ -186,13 +186,13 @@ class StreamblenderFacility : public cyclus::Facility  {
   cyclus::Composition::Ptr GoalComp_();
 
   /// @brief returns the preferred commodity sources for the isotope, iso
-  std::set<cyclus::toolkit::Commodity> prefs(int iso);
+  std::set<std::string> prefs(int iso);
 
   /// @brief make as much of the goal mat as possible with ready materials.
   void BlendStreams_();
 
   /// @brief gives current quantity of commod in inventory
-  const double inventory_quantity(cyclus::toolkit::Commodity commod) const;
+  const double inventory_quantity(std::string commod) const;
 
   /// @brief gives current quantity of all commods in inventory
   const double inventory_quantity() const;
@@ -240,15 +240,15 @@ class StreamblenderFacility : public cyclus::Facility  {
   double max_inv_size_; //should be nonnegative
 
   #pragma cyclus var{'capacity': 'max_inv_size_'}
-  std::map<cyclus::toolkit::Commodity, cyclus::toolkit::ResourceBuff> inventory;
+  std::map<std::string, cyclus::toolkit::ResourceBuff> inventory;
   cyclus::toolkit::ResourceBuff stocks;
   cyclus::toolkit::ResourceBuff wastes;
 
   /// @brief a list of preffered commodities
-  std::map<int, std::set<cyclus::toolkit::Commodity> > prefs_;
+  std::map<int, std::set<std::string> > prefs_;
 
   /// @brief map from ready time to resource buffers
-  std::map<int, std::map<cyclus::toolkit::Commodity, 
+  std::map<int, std::map<std::string, 
     cyclus::toolkit::ResourceBuff> > processing;
 
   cyclus::toolkit::CommodityRecipeContext crctx_;
