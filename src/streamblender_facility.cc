@@ -428,7 +428,7 @@ const double StreamblenderFacility::inventory_quantity(cyclus::toolkit::Commodit
   found = inventory.find(commod);
   double amt;
   if ( found != inventory.end() ){
-    amt = (*found).second;
+    amt = (*found).second.quantity();
   } else {
     amt =0;
   }
