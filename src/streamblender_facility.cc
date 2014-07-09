@@ -43,14 +43,25 @@ std::string StreamblenderFacility::str() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StreamblenderFacility::Tick() {
   LOG(cyclus::LEV_INFO3, "SBlend") << prototype() << " is ticking {";
+
+  // @TODO uncomment and implement
+  //if (context()->time() == lifetime_) {
+  //  EndLife_();
+  //}
+
   LOG(cyclus::LEV_INFO3, "SBlend") << "}";
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StreamblenderFacility::Tock() {
   LOG(cyclus::LEV_INFO3, "SBlend") << prototype() << " is tocking {";
-  BlendStreams_(); // blend streams to make the most possible GoalMat with ready mats
   BeginProcessing_(); // place unprocessed inventory into processing
+
+  std::set<std::string>::const_iterator it;
+  for (it = crctx_.in_commods().begin(); it != crctx_.in_commods().end(); ++it) {
+    BlendStreams_();
+  }
+
   LOG(cyclus::LEV_INFO3, "SBlend") << "}";
 }
 
