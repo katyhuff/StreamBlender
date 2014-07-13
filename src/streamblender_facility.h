@@ -29,7 +29,7 @@ namespace streamblender {
 /// @section agentparams Agent Parameters
 /// Place a description of the required input parameters which define the
 /// agent implementation.
-///   #. process_time : the number of timesteps a conversion process takes <0>
+///   #. process_time_ : the number of timesteps a conversion process takes <0>
 ///   #. refuel_time : the number of timesteps required to reload the processing after
 ///   a process has finished <0>
 ///
@@ -63,7 +63,7 @@ namespace streamblender {
 /// determined by its processing capacity.
 ///
 /// @section bids Bids
-/// A StreamBlender will bid on any request for any of its out_commodities, as
+/// A StreamBlender will bid on any request for any of its out_commod_ities, as
 /// long as there is a positive quantity of material in its stocks area
 /// associated with that output commodity.
 ///
@@ -206,18 +206,18 @@ class StreamblenderFacility : public cyclus::Facility  {
   }
 
   /// @brief returns the time key for ready materials
-  int ready(){ return context()->time() - process_time_ ; }
+  int ready(){ return context()->time() - process_time ; }
 
   /* --- Module Members --- */
   #pragma cyclus var {"tooltip":"input commodity",\
                       "doc":"commodity accepted by this facility"}
-  std::string in_commod_;
-  inline std::string in_commod() const {return in_commod_;};
+  std::string in_commod;
+  inline std::string in_commod_() const {return in_commod;};
 
   #pragma cyclus var {"tooltip":"output commodity",\
                       "doc":"commodity produced by this facility"}
-  std::string out_commod_;
-  inline std::string out_commod() const {return out_commod_;};
+  std::string out_commod;
+  inline std::string out_commod_() const {return out_commod;};
 
   #pragma cyclus var {"tooltip":"input recipe",\
                       "doc":"recipe accepted by this facility"}
@@ -231,7 +231,7 @@ class StreamblenderFacility : public cyclus::Facility  {
   #pragma cyclus var {"default": 0,\
                       "tooltip":"process time (timesteps)",\
                       "doc":"the time it takes to convert a received commodity (timesteps)."}
-  int process_time_; //should be nonnegative
+  int process_time; //should be nonnegative
 
   #pragma cyclus var {"default": 1e299,\
                       "tooltip":"maximum inventory size (kg)",\
@@ -254,8 +254,8 @@ class StreamblenderFacility : public cyclus::Facility  {
   cyclus::toolkit::CommodityRecipeContext crctx_;
 
   /// @brief the processing time required for a full process
-  inline void process_time(int t) { process_time_ = t; }
-  inline int process_time() const { return process_time_; }
+  inline void process_time_(int t) { process_time = t; }
+  inline int process_time_() const { return process_time; }
 
   /// @brief the maximum amount allowed in inventory
   inline void capacity(double c) { max_inv_size_ = c; }

@@ -32,9 +32,9 @@ std::string StreamblenderFacility::str() {
   std::stringstream ss;
   ss << cyclus::Facility::str();
   ss << " has facility parameters {" << "\n"
-     << "     Input Commodity = " << in_commod() << ",\n"
-     << "     Output Commodity = " << out_commod() << ",\n"
-     << "     Process Time = " << process_time() << ",\n"
+     << "     Input Commodity = " << in_commod_() << ",\n"
+     << "     Output Commodity = " << out_commod_() << ",\n"
+     << "     Process Time = " << process_time_() << ",\n"
      << "     Capacity = " << capacity() << ",\n"
      << "'}";
   return ss.str();
@@ -82,7 +82,7 @@ StreamblenderFacility::GetMatlRequests() {
     CapacityConstraint<Material> cc(amt);
     port->AddConstraint(cc);
 
-    port->AddRequest(mat, this, in_commod());
+    port->AddRequest(mat, this, in_commod_());
 
     ports.insert(port);
   }
@@ -132,7 +132,7 @@ StreamblenderFacility::GetMatlBids(cyclus::CommodMap<cyclus::Material>::type&
 
   std::set<std::string>::const_iterator it;
   BidPortfolio<Material>::Ptr port = GetBids_(commod_requests,
-                                              out_commod(),
+                                              out_commod_(),
                                               &stocks);
   if (!port->bids().empty()) {
     ports.insert(port);
@@ -181,7 +181,7 @@ void StreamblenderFacility::AddMat_(std::string commod,
   }
 
   LOG(cyclus::LEV_INFO5, "SBlend") << prototype() << " added " << mat->quantity()
-                                << " of " << in_commod()
+                                << " of " << in_commod_()
                                 << " to its inventory, which is holding "
                                 << inventory_quantity() << " total.";
 
