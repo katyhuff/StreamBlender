@@ -221,12 +221,12 @@ class StreamblenderFacility : public cyclus::Facility  {
 
   #pragma cyclus var {"tooltip":"input recipe",\
                       "doc":"recipe accepted by this facility"}
-  std::string in_recipe_;
+  std::string in_recipe;
 
   #pragma cyclus var {"tooltip":"output recipe",\
                       "doc":"recipe produced by this facility"}
-  std::string out_recipe_;
-  inline std::string out_recipe() const {return out_recipe_;};
+  std::string out_recipe;
+  inline std::string out_recipe_() const {return out_recipe;};
 
   #pragma cyclus var {"default": 0,\
                       "tooltip":"process time (timesteps)",\
@@ -237,9 +237,9 @@ class StreamblenderFacility : public cyclus::Facility  {
                       "tooltip":"maximum inventory size (kg)",\
                       "doc":"the amount of material that can be in storage at "\
                       "one time (kg)."}
-  double max_inv_size_; //should be nonnegative
+  double max_inv_size; //should be nonnegative
 
-  #pragma cyclus var{'capacity': 'max_inv_size_'}
+  #pragma cyclus var{'capacity': 'max_inv_size'}
   std::map<std::string, cyclus::toolkit::ResourceBuff> inventory;
   cyclus::toolkit::ResourceBuff stocks;
   cyclus::toolkit::ResourceBuff wastes;
@@ -258,12 +258,12 @@ class StreamblenderFacility : public cyclus::Facility  {
   inline int process_time_() const { return process_time; }
 
   /// @brief the maximum amount allowed in inventory
-  inline void capacity(double c) { max_inv_size_ = c; }
-  inline double capacity() const { return max_inv_size_; }
+  inline void capacity(double c) { max_inv_size = c; }
+  inline double capacity() const { return max_inv_size; }
 
   /// @brief current maximum amount that can be added to processing
   inline double current_capacity() const {
-    return (max_inv_size_ - inventory_quantity()); } 
+    return (max_inv_size - inventory_quantity()); } 
   
   friend class StreamblenderFacilityTest;
 };

@@ -191,7 +191,7 @@ void StreamblenderFacility::AddMat_(std::string commod,
 cyclus::Material::Ptr StreamblenderFacility::Request_() {
   double qty = std::max(0.0, current_capacity());
   return cyclus::Material::CreateUntracked(qty,
-                                        context()->GetRecipe(in_recipe_));
+                                        context()->GetRecipe(in_recipe));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -365,8 +365,8 @@ void StreamblenderFacility::MoveToStocks_(cyclus::toolkit::ResourceBuff fabbed_f
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 cyclus::Composition::Ptr StreamblenderFacility::GoalComp_(){
-  std::string out = out_recipe();
-  cyclus::Composition::Ptr recipe = context()->GetRecipe(out_recipe());
+  std::string out = out_recipe_();
+  cyclus::Composition::Ptr recipe = context()->GetRecipe(out_recipe_());
   return recipe;
 }
 
