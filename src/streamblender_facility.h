@@ -146,10 +146,6 @@ class StreamblenderFacility : public cyclus::Facility  {
   /// @param mat the material that is incoming.  
   void AddMat_(std::string commod, cyclus::Material::Ptr mat);
 
-  ///   @brief generates a request for this facility given its current state. The
-  ///   quantity of the material will be equal to the remaining inventory size.
-  cyclus::Material::Ptr Request_();
-
   /// @brief gathers information about bids
   cyclus::BidPortfolio<cyclus::Material>::Ptr GetBids_(
         cyclus::CommodMap<cyclus::Material>::type& commod_requests,
@@ -209,10 +205,10 @@ class StreamblenderFacility : public cyclus::Facility  {
   int ready(){ return context()->time() - process_time ; }
 
   /* --- Module Members --- */
-  #pragma cyclus var {"tooltip":"input commodity",\
-                      "doc":"commodity accepted by this facility"}
-  std::string in_commod;
-  inline std::string in_commod_() const {return in_commod;};
+  #pragma cyclus var {"tooltip":"input commodities",\
+                      "doc":"list of commodities accepted by this facility"}
+  std::vector< std::string > in_commods;
+  inline std::vector< std::string > in_commods_() const {return in_commods;};
 
   #pragma cyclus var {"tooltip":"output commodity",\
                       "doc":"commodity produced by this facility"}

@@ -29,10 +29,19 @@ StreamblenderFacility::StreamblenderFacility(cyclus::Context* ctx)
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StreamblenderFacility::str() {
+
+  std::string commods = "";
+  for (std::vector<std::string>::iterator commod = in_commods.begin();
+       commod != in_commods.end();
+       commod++) {
+    commods += (commod == in_commods.begin() ? "{" : ", ");
+    commods += (*commod);
+  }
+
   std::stringstream ss;
   ss << cyclus::Facility::str();
   ss << " has facility parameters {" << "\n"
-     << "     Input Commodity = " << in_commod_() << ",\n"
+     << "     Input Commodities = " << commods << ",\n"
      << "     Output Commodity = " << out_commod_() << ",\n"
      << "     Process Time = " << process_time_() << ",\n"
      << "     Capacity = " << capacity() << ",\n"
@@ -73,19 +82,27 @@ StreamblenderFacility::GetMatlRequests() {
   using cyclus::RequestPortfolio;
   using cyclus::Request;
 
+  std::set<std::string>::const_iterator it;
   std::set<RequestPortfolio<Material>::Ptr> ports;
   RequestPortfolio<Material>::Ptr port(new RequestPortfolio<Material>());
-  Material::Ptr mat = Request_();
-  double amt = mat->quantity();
+  double amt = current_capacity();
+  Material::Ptr mat = cyclus::NewBlankMaterial(amt);
 
   if (amt > cyclus::eps()) {
     CapacityConstraint<Material> cc(amt);
     port->AddConstraint(cc);
 
-    port->AddRequest(mat, this, in_commod_());
+    port->AddRequest(mat, this, *it);
 
     ports.insert(port);
-  }
+    std::vector<std::string>::const_iterator it;
+    std::vector<Request<Material>*> mutuals;
+    for (it = in_commods_().begin(); it != in_commods_().end(); ++it) {
+      mutuals.push_back(port->AddRequest(mat, this, *it));
+    }
+    port->AddMutualReqs(mutuals);
+    ports.insert(port);
+  } // if amt > eps
 
   return ports;
 }
@@ -181,17 +198,10 @@ void StreamblenderFacility::AddMat_(std::string commod,
   }
 
   LOG(cyclus::LEV_INFO5, "SBlend") << prototype() << " added " << mat->quantity()
-                                << " of " << in_commod_()
+                                << " of " << commod
                                 << " to its inventory, which is holding "
                                 << inventory_quantity() << " total.";
 
-}
-
-//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Material::Ptr StreamblenderFacility::Request_() {
-  double qty = std::max(0.0, current_capacity());
-  return cyclus::Material::CreateUntracked(qty,
-                                        context()->GetRecipe(in_recipe));
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
