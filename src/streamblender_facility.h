@@ -63,7 +63,7 @@ namespace streamblender {
 /// determined by its processing capacity.
 ///
 /// @section bids Bids
-/// A StreamBlender will bid on any request for any of its out_commod_ities, as
+/// A StreamBlender will bid on any request for any of its out_commodities, as
 /// long as there is a positive quantity of material in its stocks area
 /// associated with that output commodity.
 ///
@@ -215,9 +215,10 @@ class StreamblenderFacility : public cyclus::Facility  {
   std::string out_commod;
   inline std::string out_commod_() const {return out_commod;};
 
-  #pragma cyclus var {"tooltip":"input recipe",\
-                      "doc":"recipe accepted by this facility"}
-  std::string in_recipe;
+  #pragma cyclus var {"tooltip":"input recipes",\
+                      "doc":"a list of recipes accepted by this facility"}
+  std::vector< std::string > in_recipes;
+  inline std::vector< std::string > in_recipes_() const {return in_recipes;};
 
   #pragma cyclus var {"tooltip":"output recipe",\
                       "doc":"recipe produced by this facility"}
