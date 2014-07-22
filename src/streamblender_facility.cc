@@ -92,7 +92,7 @@ StreamblenderFacility::GetMatlRequests() {
     CapacityConstraint<Material> cc(amt);
     port->AddConstraint(cc);
 
-    port->AddRequest(mat, this, *it);
+    port->AddRequest(mat, this, ""); // insert pref commod here.
 
     ports.insert(port);
     std::vector<std::string>::const_iterator it;
