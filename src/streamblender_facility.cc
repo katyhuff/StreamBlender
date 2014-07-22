@@ -4,7 +4,9 @@ namespace streamblender {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 StreamblenderFacility::StreamblenderFacility(cyclus::Context* ctx)
-    : cyclus::Facility(ctx) {};
+    : cyclus::Facility(ctx) {
+      prefs_=Prefs_();
+    };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // pragmas
@@ -409,6 +411,48 @@ std::set<std::string> StreamblenderFacility::prefs(int iso){
     throw cyclus::ValueError(ss.str());
   }
   return preflist;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::set<int> StreamblenderFacility::IsoIdx_(int iso){
+  std::set<int> to_ret;
+  int idx;
+
+  std::vector<int>::iterator it = isos.begin();
+  while(it != isos.end()){
+    idx = find(it, isos.end(), iso) - isos.begin();
+    if( idx < isos.size() ){
+      to_ret.insert(idx);
+    }
+    ++it;
+  }
+  if( to_ret.size() == 0 ) {
+    throw cyclus::KeyError("The iso was not found in the iso->source map");
+  }
+  return to_ret;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::set<std::string> StreamblenderFacility::Sources_(int iso){
+  std::set<std::string> to_ret;
+  std::set<int> idxs = IsoIdx_(iso);
+  std::set<int>::const_iterator idx;
+  for(idx = idxs.begin(); idx !=idxs.end(); ++idx){
+    to_ret.insert(sources[*idx]);
+  }
+  return to_ret;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+std::map<int, std::set<std::string> > StreamblenderFacility::Prefs_(){
+  std::map<int, std::set<std::string> > to_ret;
+  std::vector<int>::const_iterator iso;
+  for( iso = isos.begin(); iso != isos.end(); ++iso) {
+    if( to_ret.count(*iso) == 0 ){
+      to_ret.insert(std::make_pair(*iso, Sources_(*iso)));
+    }
+  } 
+  return to_ret;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

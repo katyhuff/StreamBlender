@@ -181,8 +181,16 @@ class StreamblenderFacility : public cyclus::Facility  {
   /// @brief calculates goal material composition
   cyclus::Composition::Ptr GoalComp_();
 
-  /// @brief returns the preferred commodity sources for the isotope, iso
   std::set<std::string> prefs(int iso);
+
+  /// @brief returns the indices where the isotope appears in the isos list
+  std::set<int> IsoIdx_(int iso); 
+
+  /// @brief returns the set of sources for this iso
+  std::set<std::string> Sources_(int iso); 
+
+  /// @brief returns the map made from the isos and sources
+  std::map< int, std::set<std::string> > Prefs_(); 
 
   /// @brief make as much of the goal mat as possible with ready materials.
   void BlendStreams_();
