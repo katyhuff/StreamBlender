@@ -98,7 +98,7 @@ StreamblenderFacility::GetMatlRequests() {
     std::vector<std::string>::const_iterator it;
     std::vector<Request<Material>*> mutuals;
     for (it = in_commods_().begin(); it != in_commods_().end(); ++it) {
-      mutuals.push_back(port->AddRequest(mat, this, *it));
+      mutuals.push_back(port->AddRequest(mat, this, "")); //here too
     }
     port->AddMutualReqs(mutuals);
     ports.insert(port);

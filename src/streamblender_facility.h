@@ -241,6 +241,17 @@ class StreamblenderFacility : public cyclus::Facility  {
   cyclus::toolkit::ResourceBuff stocks;
   cyclus::toolkit::ResourceBuff wastes;
 
+  #pragma cyclus var {"tooltip":"The isotopes of interest for stream blending",\
+                      "doc":"This list can have repeated entries and should be "\
+                      "matched to the sources list."}
+  std::vector<int> isos;
+
+  #pragma cyclus var {"tooltip":"The source commodities for each isotope",\
+                      "doc":"This list cannot have repeated entries. It "\
+                      "should be matched to the isos list "}
+  std::vector<std::string> sources;
+
+
   /// @brief a list of preffered commodities
   std::map<int, std::set<std::string> > prefs_;
 
