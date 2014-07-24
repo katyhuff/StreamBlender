@@ -6,6 +6,7 @@ namespace streamblender {
 StreamBlender::StreamBlender(cyclus::Context* ctx)
     : cyclus::Facility(ctx) {
       prefs_=Prefs_();
+      cyclus::Warn<cyclus::EXPERIMENTAL_WARNING>("the StreamBlender is experimental.");
     };
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -469,7 +470,8 @@ void StreamBlender::BlendStreams_(){
       fabbed_fuel_buff.PushAll(to_add_buff.PopQty(qty));
     }
 
-    MoveToStocks_(fabbed_fuel_buff, n);
+    MoveToStocks
+      (fabbed_fuel_buff, n);
     LOG(cyclus::LEV_DEBUG2, "SBlend") << "StreamBlender " << prototype() 
                                      << " is blending streams.";
   }
