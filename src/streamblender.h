@@ -1,5 +1,5 @@
-#ifndef CYCLUS_STREAMBLENDERS_STREAMBLENDER_FACILITY_H_
-#define CYCLUS_STREAMBLENDERS_STREAMBLENDER_FACILITY_H_
+#ifndef CYCLUS_STREAMBLENDERS_STREAMBLENDER_H_
+#define CYCLUS_STREAMBLENDERS_STREAMBLENDER_H_
 
 #include <string>
 
@@ -8,12 +8,12 @@
 namespace streamblender {
 
 
-/// @class StreamblenderFacility
+/// @class StreamBlender
 ///
 /// This Facility is intended
 /// as a skeleton to guide the implementation of new Facility
 /// agents.
-/// The StreamblenderFacility class inherits from the Facility class and is
+/// The StreamBlender class inherits from the Facility class and is
 /// dynamically loaded by the Agent class when requested.
 ///
 /// @section introduction Introduction
@@ -79,11 +79,11 @@ namespace streamblender {
 /// reactor will move all material in its processing to its stocks containers,
 /// converted or not.
 ///
-class StreamblenderFacility : public cyclus::Facility  {
+class StreamBlender : public cyclus::Facility  {
  public:  
-  /// Constructor for StreamblenderFacility Class
+  /// Constructor for StreamBlender Class
   /// @param ctx the cyclus context for access to simulation-wide parameters
-  explicit StreamblenderFacility(cyclus::Context* ctx);
+  explicit StreamBlender(cyclus::Context* ctx);
 
   /// The Prime Directive
   /// Generates code that handles all input file reading and restart operations
@@ -97,21 +97,21 @@ class StreamblenderFacility : public cyclus::Facility  {
                               "of material into a goal recipe, by order of "\
                               "commodity  preference. Useful for Fuel Fabrication."}
 
-  /// A verbose printer for the StreamblenderFacility
+  /// A verbose printer for the StreamBlender
   virtual std::string str();
   
-  /// The handleTick function specific to the StreamblenderFacility.
+  /// The handleTick function specific to the StreamBlender.
   /// @param time the time of the tick  
   virtual void Tick();
 
-  /// The handleTick function specific to the StreamblenderFacility.
+  /// The handleTick function specific to the StreamBlender.
   /// @param time the time of the tock
   virtual void Tock();
 
-  /// @brief The StreamblenderFacility requests materials
+  /// @brief The StreamBlender requests materials
   virtual std::set<cyclus::RequestPortfolio<cyclus::Material>::Ptr> GetMatlRequests();
 
-  /// @brief The StreamblenderFacility places accepted trade Materials in their
+  /// @brief The StreamBlender places accepted trade Materials in their
   /// Inventory
   virtual void AcceptMatlTrades(
       const std::vector< std::pair<cyclus::Trade<cyclus::Material>,
@@ -136,7 +136,7 @@ class StreamblenderFacility : public cyclus::Facility  {
 
   /* --- */
 
-  /* --- StreamblenderFacility Members --- */
+  /* --- StreamBlender Members --- */
 
   /* --- */
 
@@ -281,9 +281,9 @@ class StreamblenderFacility : public cyclus::Facility  {
   inline double current_capacity() const {
     return (max_inv_size - inventory_quantity()); } 
   
-  friend class StreamblenderFacilityTest;
+  friend class StreamBlenderTest;
 };
 
 }  // namespace streamblender
 
-#endif  // CYCLUS_STREAMBLENDERS_STREAMBLENDER_FACILITY_H_
+#endif  // CYCLUS_STREAMBLENDERS_STREAMBLENDER_H_

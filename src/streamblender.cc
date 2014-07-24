@@ -1,9 +1,9 @@
-#include "streamblender_facility.h"
+#include "streamblender.h"
 
 namespace streamblender {
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-StreamblenderFacility::StreamblenderFacility(cyclus::Context* ctx)
+StreamBlender::StreamBlender(cyclus::Context* ctx)
     : cyclus::Facility(ctx) {
       prefs_=Prefs_();
     };
@@ -11,26 +11,26 @@ StreamblenderFacility::StreamblenderFacility(cyclus::Context* ctx)
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // pragmas
 
-#pragma cyclus def schema streamblender::StreamblenderFacility
+#pragma cyclus def schema streamblender::StreamBlender
 
-#pragma cyclus def annotations streamblender::StreamblenderFacility
+#pragma cyclus def annotations streamblender::StreamBlender
 
-#pragma cyclus def initinv streamblender::StreamblenderFacility
+#pragma cyclus def initinv streamblender::StreamBlender
 
-#pragma cyclus def snapshotinv streamblender::StreamblenderFacility
+#pragma cyclus def snapshotinv streamblender::StreamBlender
 
-#pragma cyclus def initfromdb streamblender::StreamblenderFacility
+#pragma cyclus def initfromdb streamblender::StreamBlender
 
-#pragma cyclus def initfromcopy streamblender::StreamblenderFacility
+#pragma cyclus def initfromcopy streamblender::StreamBlender
 
-#pragma cyclus def infiletodb streamblender::StreamblenderFacility
+#pragma cyclus def infiletodb streamblender::StreamBlender
 
-#pragma cyclus def snapshot streamblender::StreamblenderFacility
+#pragma cyclus def snapshot streamblender::StreamBlender
 
-#pragma cyclus def clone streamblender::StreamblenderFacility
+#pragma cyclus def clone streamblender::StreamBlender
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::string StreamblenderFacility::str() {
+std::string StreamBlender::str() {
 
   std::string commods = "";
   for (std::vector<std::string>::iterator commod = in_commods.begin();
@@ -52,7 +52,7 @@ std::string StreamblenderFacility::str() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StreamblenderFacility::Tick() {
+void StreamBlender::Tick() {
   LOG(cyclus::LEV_INFO3, "SBlend") << prototype() << " is ticking {";
 
   // @TODO uncomment and implement
@@ -64,7 +64,7 @@ void StreamblenderFacility::Tick() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StreamblenderFacility::Tock() {
+void StreamBlender::Tock() {
   LOG(cyclus::LEV_INFO3, "SBlend") << prototype() << " is tocking {";
   BeginProcessing_(); // place unprocessed inventory into processing
 
@@ -78,7 +78,7 @@ void StreamblenderFacility::Tock() {
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<cyclus::RequestPortfolio<cyclus::Material>::Ptr>
-StreamblenderFacility::GetMatlRequests() {
+StreamBlender::GetMatlRequests() {
   using cyclus::CapacityConstraint;
   using cyclus::Material;
   using cyclus::RequestPortfolio;
@@ -107,7 +107,7 @@ StreamblenderFacility::GetMatlRequests() {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StreamblenderFacility::AcceptMatlTrades(
+void StreamBlender::AcceptMatlTrades(
   const std::vector< std::pair<cyclus::Trade<cyclus::Material>,
   cyclus::Material::Ptr> >& responses) {
   using cyclus::Material;
@@ -139,7 +139,7 @@ void StreamblenderFacility::AcceptMatlTrades(
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::set<cyclus::BidPortfolio<cyclus::Material>::Ptr>
-StreamblenderFacility::GetMatlBids(cyclus::CommodMap<cyclus::Material>::type&
+StreamBlender::GetMatlBids(cyclus::CommodMap<cyclus::Material>::type&
                           commod_requests) {
   using cyclus::BidPortfolio;
   using cyclus::Material;
@@ -158,7 +158,7 @@ StreamblenderFacility::GetMatlBids(cyclus::CommodMap<cyclus::Material>::type&
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StreamblenderFacility::GetMatlTrades(
+void StreamBlender::GetMatlTrades(
   const std::vector< cyclus::Trade<cyclus::Material> >& trades,
   std::vector<std::pair<cyclus::Trade<cyclus::Material>,
   cyclus::Material::Ptr> >& responses) {
@@ -183,7 +183,7 @@ void StreamblenderFacility::GetMatlTrades(
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StreamblenderFacility::AddMat_(std::string commod, 
+void StreamBlender::AddMat_(std::string commod, 
     cyclus::Material::Ptr mat) {
 
   LOG(cyclus::LEV_INFO5, "SBlend") << prototype() << " is initially holding "
@@ -204,7 +204,7 @@ void StreamblenderFacility::AddMat_(std::string commod,
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::BidPortfolio<cyclus::Material>::Ptr StreamblenderFacility::GetBids_(
+cyclus::BidPortfolio<cyclus::Material>::Ptr StreamBlender::GetBids_(
     cyclus::CommodMap<cyclus::Material>::type& commod_requests,
     std::string commod,
     cyclus::toolkit::ResourceBuff* buffer) {
@@ -243,7 +243,7 @@ cyclus::BidPortfolio<cyclus::Material>::Ptr StreamblenderFacility::GetBids_(
   return port;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Material::Ptr StreamblenderFacility::TradeResponse_(
+cyclus::Material::Ptr StreamBlender::TradeResponse_(
     double qty,
     cyclus::toolkit::ResourceBuff* buffer) {
   using cyclus::Material;
@@ -268,7 +268,7 @@ cyclus::Material::Ptr StreamblenderFacility::TradeResponse_(
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StreamblenderFacility::BeginProcessing_(){
+void StreamBlender::BeginProcessing_(){
   LOG(cyclus::LEV_DEBUG2, "SBlend") << "CommodConverter " << prototype()
                                     << " added resources to processing";
   std::map<std::string, cyclus::toolkit::ResourceBuff>::iterator it;
@@ -285,7 +285,7 @@ void StreamblenderFacility::BeginProcessing_(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::toolkit::ResourceBuff StreamblenderFacility::MeetNeed_(int iso, int n){
+cyclus::toolkit::ResourceBuff StreamBlender::MeetNeed_(int iso, int n){
   using cyclus::toolkit::ResourceBuff;
 
   ResourceBuff iso_source_buff =  ResourceBuff();
@@ -307,7 +307,7 @@ cyclus::toolkit::ResourceBuff StreamblenderFacility::MeetNeed_(int iso, int n){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-int StreamblenderFacility::NPossible_(){
+int StreamBlender::NPossible_(){
 
   bool first_run = true;
   int n_poss = 0;
@@ -341,7 +341,7 @@ int StreamblenderFacility::NPossible_(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Material::Ptr StreamblenderFacility::CollapseBuff(cyclus::toolkit::ResourceBuff to_collapse){
+cyclus::Material::Ptr StreamBlender::CollapseBuff(cyclus::toolkit::ResourceBuff to_collapse){
   using cyclus::toolkit::Manifest;
   using cyclus::Material;
   using cyclus::ResCast;
@@ -359,7 +359,7 @@ cyclus::Material::Ptr StreamblenderFacility::CollapseBuff(cyclus::toolkit::Resou
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StreamblenderFacility::MoveToStocks_(cyclus::toolkit::ResourceBuff fabbed_fuel_buff, int n_poss){
+void StreamBlender::MoveToStocks_(cyclus::toolkit::ResourceBuff fabbed_fuel_buff, int n_poss){
   using cyclus::toolkit::Manifest;
   using cyclus::Material;
   using cyclus::ResCast;
@@ -373,19 +373,19 @@ void StreamblenderFacility::MoveToStocks_(cyclus::toolkit::ResourceBuff fabbed_f
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Composition::Ptr StreamblenderFacility::GoalComp_(){
+cyclus::Composition::Ptr StreamBlender::GoalComp_(){
   std::string out = out_recipe_();
   cyclus::Composition::Ptr recipe = context()->GetRecipe(out_recipe_());
   return recipe;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::CompMap StreamblenderFacility::GoalCompMap_(){
+cyclus::CompMap StreamBlender::GoalCompMap_(){
   return GoalComp_()->mass();
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-double StreamblenderFacility::GoalCompMass_(){
+double StreamBlender::GoalCompMass_(){
   double amt = 0;
   std::map<int, double>::const_iterator it;
   cyclus::CompMap goal = GoalCompMap_();
@@ -395,7 +395,7 @@ double StreamblenderFacility::GoalCompMass_(){
   return amt;
 }
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::set<std::string> StreamblenderFacility::prefs(int iso){
+std::set<std::string> StreamBlender::prefs(int iso){
 
   std::set<std::string> preflist;
   std::map<int, std::set<std::string> >::const_iterator it;
@@ -411,7 +411,7 @@ std::set<std::string> StreamblenderFacility::prefs(int iso){
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::set<int> StreamblenderFacility::IsoIdx_(int iso){
+std::set<int> StreamBlender::IsoIdx_(int iso){
   std::set<int> to_ret;
   int idx;
 
@@ -430,7 +430,7 @@ std::set<int> StreamblenderFacility::IsoIdx_(int iso){
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::set<std::string> StreamblenderFacility::Sources_(int iso){
+std::set<std::string> StreamBlender::Sources_(int iso){
   std::set<std::string> to_ret;
   std::set<int> idxs = IsoIdx_(iso);
   std::set<int>::const_iterator idx;
@@ -441,7 +441,7 @@ std::set<std::string> StreamblenderFacility::Sources_(int iso){
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-std::map<int, std::set<std::string> > StreamblenderFacility::Prefs_(){
+std::map<int, std::set<std::string> > StreamBlender::Prefs_(){
   std::map<int, std::set<std::string> > to_ret;
   std::vector<int>::const_iterator iso;
   for( iso = isos.begin(); iso != isos.end(); ++iso) {
@@ -453,7 +453,7 @@ std::map<int, std::set<std::string> > StreamblenderFacility::Prefs_(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StreamblenderFacility::BlendStreams_(){
+void StreamBlender::BlendStreams_(){
   using cyclus::Material;
   using cyclus::toolkit::ResourceBuff;
 
@@ -470,13 +470,13 @@ void StreamblenderFacility::BlendStreams_(){
     }
 
     MoveToStocks_(fabbed_fuel_buff, n);
-    LOG(cyclus::LEV_DEBUG2, "SBlend") << "StreamblenderFacility " << prototype() 
+    LOG(cyclus::LEV_DEBUG2, "SBlend") << "StreamBlender " << prototype() 
                                      << " is blending streams.";
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const double StreamblenderFacility::inventory_quantity(std::string commod)const {
+const double StreamBlender::inventory_quantity(std::string commod)const {
   using cyclus::toolkit::ResourceBuff;
 
   std::map<std::string, ResourceBuff>::const_iterator found;
@@ -491,7 +491,7 @@ const double StreamblenderFacility::inventory_quantity(std::string commod)const 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const double StreamblenderFacility::inventory_quantity() const {
+const double StreamBlender::inventory_quantity() const {
   using cyclus::toolkit::ResourceBuff;
 
   double total = 0;
@@ -503,8 +503,8 @@ const double StreamblenderFacility::inventory_quantity() const {
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-extern "C" cyclus::Agent* ConstructStreamblenderFacility(cyclus::Context* ctx) {
-  return new StreamblenderFacility(ctx);
+extern "C" cyclus::Agent* ConstructStreamBlender(cyclus::Context* ctx) {
+  return new StreamBlender(ctx);
 }
 
 } // namespace streamblender
