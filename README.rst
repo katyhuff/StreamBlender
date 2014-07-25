@@ -1,4 +1,6 @@
-Separation Matrix
+.. _streamblender:
+
+StreamBlender
 =================
 
 This facility blends resources into a goal resource based on preferences and a
