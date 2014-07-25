@@ -20,15 +20,42 @@ StreamBlender::StreamBlender(cyclus::Context* ctx)
 
 #pragma cyclus def snapshotinv streamblender::StreamBlender
 
-#pragma cyclus def initfromdb streamblender::StreamBlender
-
-#pragma cyclus def initfromcopy streamblender::StreamBlender
-
 #pragma cyclus def infiletodb streamblender::StreamBlender
 
 #pragma cyclus def snapshot streamblender::StreamBlender
 
 #pragma cyclus def clone streamblender::StreamBlender
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void StreamBlender::InitFrom(StreamBlender* m) {
+
+  #pragma cyclus impl initfromcopy streamblender::StreamBlender
+
+  cyclus::toolkit::CommodityProducer::Copy(m);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void StreamBlender::InitFrom(cyclus::QueryableBackend* b){
+
+  #pragma cyclus impl initfromdb streamblender::StreamBlender
+
+  using cyclus::toolkit::Commodity;
+  Commodity commod = Commodity(out_commod);
+  cyclus::toolkit::CommodityProducer::Add(commod);
+  cyclus::toolkit::CommodityProducer::SetCapacity(commod, capacity);
+  cyclus::toolkit::CommodityProducer::SetCost(commod, capacity);
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+void StreamBlender::EnterNotify() {
+  Facility::EnterNotify();
+
+  using cyclus::toolkit::Commodity;
+  Commodity commod = Commodity(out_commod);
+  cyclus::toolkit::CommodityProducer::Add(commod);
+  cyclus::toolkit::CommodityProducer::SetCapacity(commod, capacity);
+  cyclus::toolkit::CommodityProducer::SetCost(commod, capacity);
+}
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 std::string StreamBlender::str() {
@@ -47,7 +74,8 @@ std::string StreamBlender::str() {
      << "     Input Commodities = " << commods << ",\n"
      << "     Output Commodity = " << out_commod_() << ",\n"
      << "     Process Time = " << process_time_() << ",\n"
-     << "     Capacity = " << capacity() << ",\n"
+     << "     Maximum Inventory Size = " << max_inv_size_() << ",\n"
+     << "     Capacity = " << capacity_() << ",\n"
      << "'}";
   return ss.str();
 }
@@ -270,7 +298,7 @@ cyclus::Material::Ptr StreamBlender::TradeResponse_(
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StreamBlender::BeginProcessing_(){
-  LOG(cyclus::LEV_DEBUG2, "SBlend") << "CommodConverter " << prototype()
+  LOG(cyclus::LEV_DEBUG2, "SBlend") << "StreamBlender " << prototype()
                                     << " added resources to processing";
   std::map<std::string, cyclus::toolkit::ResourceBuff>::iterator it;
   for (it = inventory.begin(); it != inventory.end(); ++it){
@@ -470,8 +498,7 @@ void StreamBlender::BlendStreams_(){
       fabbed_fuel_buff.PushAll(to_add_buff.PopQty(qty));
     }
 
-    MoveToStocks
-      (fabbed_fuel_buff, n);
+    MoveToStocks_(fabbed_fuel_buff, n);
     LOG(cyclus::LEV_DEBUG2, "SBlend") << "StreamBlender " << prototype() 
                                      << " is blending streams.";
   }

@@ -79,7 +79,9 @@ namespace streamblender {
 /// reactor will move all material in its processing to its stocks containers,
 /// converted or not.
 ///
-class StreamBlender : public cyclus::Facility  {
+class StreamBlender : 
+  public cyclus::Facility, 
+  public cyclus::toolkit::CommodityProducer {
  public:  
   /// Constructor for StreamBlender Class
   /// @param ctx the cyclus context for access to simulation-wide parameters
@@ -99,6 +101,10 @@ class StreamBlender : public cyclus::Facility  {
 
   /// A verbose printer for the StreamBlender
   virtual std::string str();
+
+  /// When this facility enters the simulation, register it as a commodity 
+  /// producer.
+  virtual void EnterNotify();
   
   /// The handleTick function specific to the StreamBlender.
   /// @param time the time of the tick  
@@ -244,7 +250,12 @@ class StreamBlender : public cyclus::Facility  {
                       "one time (kg)."}
   double max_inv_size; //should be nonnegative
 
-  #pragma cyclus var{'capacity': 'max_inv_size'}
+  #pragma cyclus var {"default": 1e299,\
+                      "tooltip":"maximum processing rate (kg)",\
+                      "doc":"the amount of material that can be processed per "\
+                      "timestep (kg)."}
+  double capacity; //should be nonnegative
+
   std::map<std::string, cyclus::toolkit::ResourceBuff> inventory;
   cyclus::toolkit::ResourceBuff stocks;
   cyclus::toolkit::ResourceBuff wastes;
@@ -274,8 +285,12 @@ class StreamBlender : public cyclus::Facility  {
   inline int process_time_() const { return process_time; }
 
   /// @brief the maximum amount allowed in inventory
-  inline void capacity(double c) { max_inv_size = c; }
-  inline double capacity() const { return max_inv_size; }
+  inline void max_inv_size_(double m) { max_inv_size = m; }
+  inline double max_inv_size_() const { return max_inv_size; }
+
+  /// @brief the maximum amount allowed in inventory
+  inline void capacity_(double c) { capacity = c; }
+  inline double capacity_() const { return capacity; }
 
   /// @brief current maximum amount that can be added to processing
   inline double current_capacity() const {
