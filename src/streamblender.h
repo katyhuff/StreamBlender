@@ -10,9 +10,13 @@ namespace streamblender {
 
 /// @class StreamBlender
 ///
-/// This Facility is intended
-/// as a skeleton to guide the implementation of new Facility
-/// agents.
+/// This holds a module for cyclus that blends streams of material into a 
+/// resulting material. It aims for a goal recipe and can specify an order of 
+/// preference for using available commodities. It was designed to run as a fuel 
+/// fabrication facility, but can be used for any purpose that requires a 
+/// combining of commodities that represent material streams. It was initially 
+/// developed to run the fco code-to-code comparison.
+///
 /// The StreamBlender class inherits from the Facility class and is
 /// dynamically loaded by the Agent class when requested.
 ///
