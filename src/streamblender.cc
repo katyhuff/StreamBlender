@@ -223,7 +223,8 @@ void StreamBlender::AddMat_(std::string commod,
     cyclus::Material::Ptr mat) {
 
   LOG(cyclus::LEV_INFO5, "SBlend") << prototype() << " is initially holding "
-                                << rawbuffs_quantity() << " total.";
+                                << rawbuffs_quantity() << " raw and "
+                                << blendbuff.quantity() << " blended.";
 
   try {
     rawbuffs[commod].Push(mat);
@@ -287,7 +288,7 @@ cyclus::Material::Ptr StreamBlender::TradeResponse_(
 
   std::vector<Material::Ptr> manifest;
   try {
-    // pop amount from rawbuffs and blob it into one material
+    // pop amount from buffer and blob it into one material
     manifest = ResCast<Material>(buffer->PopQty(qty));
   } catch(cyclus::Error& e) {
     e.msg(Agent::InformErrorMsg(e.msg()));

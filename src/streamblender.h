@@ -298,7 +298,7 @@ class StreamBlender :
 
   /// @brief current maximum amount that can be added to processing
   inline double current_capacity() const {
-    return (max_inv_size - rawbuffs_quantity()); } 
+    return (max_inv_size - blendbuff.quantity()); } 
   
   friend class StreamBlenderTest;
 };
