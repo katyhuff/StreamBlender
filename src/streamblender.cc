@@ -129,7 +129,7 @@ StreamBlender::GetMatlRequests() {
       mutuals.push_back(port->AddRequest(mat, this, *it)); 
 
       LOG(cyclus::LEV_INFO5, "SBlend") << prototype()
-                                    << " requested"
+                                    << " requested "
                                     << mat->quantity()
                                     << " of " << *it;
     }
@@ -211,7 +211,8 @@ void StreamBlender::GetMatlTrades(
     LOG(cyclus::LEV_INFO5, "SBlend") << prototype()
                                   << " just received an order"
                                   << " for " << it->amt
-                                  << " of " << commodity;
+                                  << " of " << commodity
+                                  << " and offered " << qty;
 
   }
 
@@ -226,15 +227,15 @@ void StreamBlender::AddMat_(std::string commod,
 
   try {
     rawbuffs[commod].Push(mat);
+    LOG(cyclus::LEV_INFO5, "SBlend") << prototype() << " added " << mat->quantity()
+                                  << " of " << commod
+                                  << " to its rawbuffs, which is holding "
+                                  << rawbuffs_quantity() << " total.";
   } catch (cyclus::Error& e) {
     e.msg(Agent::InformErrorMsg(e.msg()));
     throw e;
   }
 
-  LOG(cyclus::LEV_INFO5, "SBlend") << prototype() << " added " << mat->quantity()
-                                << " of " << commod
-                                << " to its rawbuffs, which is holding "
-                                << rawbuffs_quantity() << " total.";
 
 }
 
