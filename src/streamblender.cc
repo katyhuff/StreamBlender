@@ -95,7 +95,7 @@ void StreamBlender::Tick() {
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StreamBlender::Tock() {
   LOG(cyclus::LEV_INFO3, "SBlend") << prototype() << " is tocking {";
-  BeginProcessing_(); // place unprocessed inventory into processing
+  BeginProcessing_(); // place unprocessed rawbuffs into processing
 
   std::set<std::string>::const_iterator it;
   for (it = crctx_.in_commods().begin(); it != crctx_.in_commods().end(); ++it) {
@@ -178,7 +178,7 @@ StreamBlender::GetMatlBids(cyclus::CommodMap<cyclus::Material>::type&
   std::set<std::string>::const_iterator it;
   BidPortfolio<Material>::Ptr port = GetBids_(commod_requests,
                                               out_commod_(),
-                                              &stocks);
+                                              &blendbuff);
   if (!port->bids().empty()) {
     ports.insert(port);
   }
@@ -198,9 +198,9 @@ void StreamBlender::GetMatlTrades(
   std::vector< Trade<Material> >::const_iterator it;
   for (it = trades.begin(); it != trades.end(); ++it) {
     std::string commodity = it->request->commodity();
-    double qty = it->amt;
+    double qty = std::min(it->amt, blendbuff.quantity());
     // create a material pointer representing what you can offer
-    Material::Ptr response = TradeResponse_(qty, &stocks);
+    Material::Ptr response = TradeResponse_(qty, &blendbuff);
 
     responses.push_back(std::make_pair(*it, response));
     LOG(cyclus::LEV_INFO5, "SBlend") << prototype()
@@ -216,10 +216,10 @@ void StreamBlender::AddMat_(std::string commod,
     cyclus::Material::Ptr mat) {
 
   LOG(cyclus::LEV_INFO5, "SBlend") << prototype() << " is initially holding "
-                                << inventory_quantity() << " total.";
+                                << rawbuffs_quantity() << " total.";
 
   try {
-    inventory[commod].Push(mat);
+    rawbuffs[commod].Push(mat);
   } catch (cyclus::Error& e) {
     e.msg(Agent::InformErrorMsg(e.msg()));
     throw e;
@@ -227,8 +227,8 @@ void StreamBlender::AddMat_(std::string commod,
 
   LOG(cyclus::LEV_INFO5, "SBlend") << prototype() << " added " << mat->quantity()
                                 << " of " << commod
-                                << " to its inventory, which is holding "
-                                << inventory_quantity() << " total.";
+                                << " to its rawbuffs, which is holding "
+                                << rawbuffs_quantity() << " total.";
 
 }
 
@@ -280,7 +280,7 @@ cyclus::Material::Ptr StreamBlender::TradeResponse_(
 
   std::vector<Material::Ptr> manifest;
   try {
-    // pop amount from inventory and blob it into one material
+    // pop amount from rawbuffs and blob it into one material
     manifest = ResCast<Material>(buffer->PopQty(qty));
   } catch(cyclus::Error& e) {
     e.msg(Agent::InformErrorMsg(e.msg()));
@@ -298,13 +298,13 @@ cyclus::Material::Ptr StreamBlender::TradeResponse_(
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 void StreamBlender::BeginProcessing_(){
-  LOG(cyclus::LEV_DEBUG2, "SBlend") << "StreamBlender " << prototype()
-                                    << " added resources to processing";
   std::map<std::string, cyclus::toolkit::ResourceBuff>::iterator it;
-  for (it = inventory.begin(); it != inventory.end(); ++it){
+  for (it = rawbuffs.begin(); it != rawbuffs.end(); ++it){
     while (!(*it).second.empty()){
       try {
         processing[context()->time()][(*it).first].Push((*it).second.Pop());
+        LOG(cyclus::LEV_DEBUG2, "SBlend") << "StreamBlender " << prototype()
+                                        << " added resources to processing";
       } catch(cyclus::Error& e) {
         e.msg(Agent::InformErrorMsg(e.msg()));
         throw e;
@@ -370,12 +370,12 @@ int StreamBlender::NPossible_(){
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-cyclus::Material::Ptr StreamBlender::CollapseBuff(cyclus::toolkit::ResourceBuff to_collapse){
+cyclus::Material::Ptr StreamBlender::CollapseBuff(cyclus::toolkit::ResourceBuff* to_collapse){
   using cyclus::toolkit::Manifest;
   using cyclus::Material;
   using cyclus::ResCast;
-  double qty =  to_collapse.quantity();
-  Manifest manifest = to_collapse.PopQty(qty);
+  double qty =  to_collapse->quantity();
+  Manifest manifest = to_collapse->PopQty(qty);
 
 
   Material::Ptr back = ResCast<Material>(manifest.back());
@@ -388,7 +388,7 @@ cyclus::Material::Ptr StreamBlender::CollapseBuff(cyclus::toolkit::ResourceBuff 
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-void StreamBlender::MoveToStocks_(cyclus::toolkit::ResourceBuff fabbed_fuel_buff, int n_poss){
+void StreamBlender::Blend_(cyclus::toolkit::ResourceBuff* fabbed_fuel_buff, int n_poss){
   using cyclus::toolkit::Manifest;
   using cyclus::Material;
   using cyclus::ResCast;
@@ -397,7 +397,7 @@ void StreamBlender::MoveToStocks_(cyclus::toolkit::ResourceBuff fabbed_fuel_buff
 
   for( int i=0; i<n_poss; ++i){
     Material::Ptr goal_mat =  soup->ExtractComp(GoalCompMass_(), GoalComp_());
-    stocks.Push(goal_mat);
+    blendbuff.Push(goal_mat);
   }
 }
 
@@ -498,20 +498,20 @@ void StreamBlender::BlendStreams_(){
       fabbed_fuel_buff.PushAll(to_add_buff.PopQty(qty));
     }
 
-    MoveToStocks_(fabbed_fuel_buff, n);
+    Blend_(&fabbed_fuel_buff, n);
     LOG(cyclus::LEV_DEBUG2, "SBlend") << "StreamBlender " << prototype() 
                                      << " is blending streams.";
   }
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const double StreamBlender::inventory_quantity(std::string commod)const {
+const double StreamBlender::rawbuffs_quantity(std::string commod)const {
   using cyclus::toolkit::ResourceBuff;
 
   std::map<std::string, ResourceBuff>::const_iterator found;
-  found = inventory.find(commod);
+  found = rawbuffs.find(commod);
   double amt;
-  if ( found != inventory.end() ){
+  if ( found != rawbuffs.end() ){
     amt = (*found).second.quantity();
   } else {
     amt =0;
@@ -520,13 +520,13 @@ const double StreamBlender::inventory_quantity(std::string commod)const {
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-const double StreamBlender::inventory_quantity() const {
+const double StreamBlender::rawbuffs_quantity() const {
   using cyclus::toolkit::ResourceBuff;
 
   double total = 0;
   std::map<std::string, ResourceBuff>::const_iterator it;
-  for( it = inventory.begin(); it != inventory.end(); ++it) {
-    total += inventory_quantity((*it).first);
+  for( it = rawbuffs.begin(); it != rawbuffs.end(); ++it) {
+    total += rawbuffs_quantity((*it).first);
   }
   return total;
 }

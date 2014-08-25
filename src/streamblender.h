@@ -23,12 +23,12 @@ namespace streamblender {
 /// @section introduction Introduction
 /// The StreamBlender is a facility that receives commodities, holds onto them
 /// for some number of months, offers them to the market of the new commodity. It
-/// has three  stocks areas which hold commods of commodities: reserves,
-/// processing, and  stocks. Incoming commodity orders are placed into reserves,
+/// has three  blendbuff areas which hold commods of commodities: reserves,
+/// processing, and  blendbuff. Incoming commodity orders are placed into reserves,
 /// from which the  processing area is populated. When a process (some number of
 /// months spent waiting)  has been completed, the commodity is converted and
-/// moved into stocks. Requests for  commodities are bid upon based on the state
-/// of the commodities in the stocks.
+/// moved into blendbuff. Requests for  commodities are bid upon based on the state
+/// of the commodities in the blendbuff.
 ///
 /// @section agentparams Agent Parameters
 /// Place a description of the required input parameters which define the
@@ -58,7 +58,7 @@ namespace streamblender {
 /// The StreamBlender can manage multiple input-output commodity pairs, and keeps
 /// track of the pair that each resource belongs to. Resources move through the
 /// system independently of their input/output commodity types, but when they
-/// reach the stocks area, they are offered as bids depedent on their output
+/// reach the blendbuff area, they are offered as bids depedent on their output
 /// commodity type.
 ///
 /// @section requests Requests
@@ -68,19 +68,19 @@ namespace streamblender {
 ///
 /// @section bids Bids
 /// A StreamBlender will bid on any request for any of its out_commodities, as
-/// long as there is a positive quantity of material in its stocks area
+/// long as there is a positive quantity of material in its blendbuff area
 /// associated with that output commodity.
 ///
 /// @section ics Initial Conditions
 /// A StreamBlender can be deployed with any number of commods in its reserve,
-/// processing, and stocks buffers. Recipes and commodities for each of these
+/// processing, and blendbuff buffers. Recipes and commodities for each of these
 /// groupings must be specified.
 ///
-/// @todo add decommissioning behavior if material is still in stocks
+/// @todo add decommissioning behavior if material is still in blendbuff
 ///
 /// @section end End of Life
 /// If the current time step is equivalent to the facility's lifetime, the
-/// reactor will move all material in its processing to its stocks containers,
+/// reactor will move all material in its processing to its blendbuff containers,
 /// converted or not.
 ///
 class StreamBlender : 
@@ -128,14 +128,14 @@ class StreamBlender :
       cyclus::Material::Ptr> >& responses);
 
   /// @brief Responds to each request for this facility's commodity.  If a given
-  /// request is more than this facility's inventory capacity, it will
+  /// request is more than this facility's rawbuffs capacity, it will
   /// offer its minimum of its capacities.
   virtual std::set<cyclus::BidPortfolio<cyclus::Material>::Ptr>
       GetMatlBids(cyclus::CommodMap<cyclus::Material>::type&
                   commod_requests);
 
   /// @brief respond to each trade with a material enriched to the appropriate
-  /// level given this facility's inventory
+  /// level given this facility's rawbuffs
   ///
   /// @param trades all trades in which this trader is the supplier
   /// @param responses a container to populate with responses to each trade
@@ -151,7 +151,7 @@ class StreamBlender :
   /* --- */
 
  protected:
-  /// @brief adds a material into the incoming commodity inventory
+  /// @brief adds a material into the incoming commodity rawbuffs
   /// @param commod the commodity name associated with the material
   /// @param mat the material that is incoming.  
   void AddMat_(std::string commod, cyclus::Material::Ptr mat);
@@ -167,7 +167,7 @@ class StreamBlender :
       double qty,
       cyclus::toolkit::ResourceBuff* buffer);
 
-  /// @brief Move all unprocessed inventory to processing
+  /// @brief Move all unprocessed rawbuffs to processing
   void BeginProcessing_();
  
   /// @brief This part does the blending. 
@@ -177,10 +177,10 @@ class StreamBlender :
   int NPossible_();
 
   /// @brief collapse a resourcebuff into a single material
-  cyclus::Material::Ptr CollapseBuff(cyclus::toolkit::ResourceBuff to_collapse);
+  cyclus::Material::Ptr CollapseBuff(cyclus::toolkit::ResourceBuff* to_collapse);
 
-  /// @brief move a resourcebuff of blended materials into the stocks
-  void MoveToStocks_(cyclus::toolkit::ResourceBuff blended_buff, int n_poss);
+  /// @brief move a resourcebuff of blended materials into the blendbuff
+  void Blend_(cyclus::toolkit::ResourceBuff* blended_buff, int n_poss);
 
   /// @brief calculates the total mass of the goal material composition [kg]
   double GoalCompMass_();
@@ -205,11 +205,11 @@ class StreamBlender :
   /// @brief make as much of the goal mat as possible with ready materials.
   void BlendStreams_();
 
-  /// @brief gives current quantity of commod in inventory
-  const double inventory_quantity(std::string commod) const;
+  /// @brief gives current quantity of commod in rawbuffs
+  const double rawbuffs_quantity(std::string commod) const;
 
-  /// @brief gives current quantity of all commods in inventory
-  const double inventory_quantity() const;
+  /// @brief gives current quantity of all commods in rawbuffs
+  const double rawbuffs_quantity() const;
 
   /// @brief this facility's commodity-recipe context
   inline void crctx(const cyclus::toolkit::CommodityRecipeContext& crctx) {
@@ -249,7 +249,7 @@ class StreamBlender :
   int process_time; //should be nonnegative
 
   #pragma cyclus var {"default": 1e299,\
-                      "tooltip":"maximum inventory size (kg)",\
+                      "tooltip":"maximum rawbuffs size (kg)",\
                       "doc":"the amount of material that can be in storage at "\
                       "one time (kg)."}
   double max_inv_size; //should be nonnegative
@@ -260,10 +260,6 @@ class StreamBlender :
                       "timestep (kg)."}
   double capacity; //should be nonnegative
 
-  std::map<std::string, cyclus::toolkit::ResourceBuff> inventory;
-  cyclus::toolkit::ResourceBuff stocks;
-  cyclus::toolkit::ResourceBuff wastes;
-
   #pragma cyclus var {"tooltip":"The isotopes of interest for stream blending",\
                       "doc":"This list can have repeated entries and should be "\
                       "matched to the sources list."}
@@ -273,6 +269,10 @@ class StreamBlender :
                       "doc":"This list cannot have repeated entries. It "\
                       "should be matched to the isos list "}
   std::vector<std::string> sources;
+
+  std::map<std::string, cyclus::toolkit::ResourceBuff> rawbuffs;
+  cyclus::toolkit::ResourceBuff blendbuff;
+  cyclus::toolkit::ResourceBuff wastes;
 
 
   /// @brief a list of preffered commodities
@@ -288,17 +288,17 @@ class StreamBlender :
   inline void process_time_(int t) { process_time = t; }
   inline int process_time_() const { return process_time; }
 
-  /// @brief the maximum amount allowed in inventory
+  /// @brief the maximum amount allowed in rawbuffs
   inline void max_inv_size_(double m) { max_inv_size = m; }
   inline double max_inv_size_() const { return max_inv_size; }
 
-  /// @brief the maximum amount allowed in inventory
+  /// @brief the maximum amount allowed in rawbuffs
   inline void capacity_(double c) { capacity = c; }
   inline double capacity_() const { return capacity; }
 
   /// @brief current maximum amount that can be added to processing
   inline double current_capacity() const {
-    return (max_inv_size - inventory_quantity()); } 
+    return (max_inv_size - rawbuffs_quantity()); } 
   
   friend class StreamBlenderTest;
 };
