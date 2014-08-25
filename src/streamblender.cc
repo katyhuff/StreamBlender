@@ -98,9 +98,9 @@ void StreamBlender::Tock() {
   BeginProcessing_(); // place unprocessed rawbuffs into processing
 
   std::set<std::string>::const_iterator it;
-  for (it = crctx_.in_commods().begin(); it != crctx_.in_commods().end(); ++it) {
-    BlendStreams_();
-  }
+  //for (it = crctx_.in_commods().begin(); it != crctx_.in_commods().end(); ++it) {
+  BlendStreams_();
+  //}
 
   LOG(cyclus::LEV_INFO3, "SBlend") << "}";
 }
@@ -332,13 +332,9 @@ cyclus::toolkit::ResourceBuff StreamBlender::MeetNeed_(int iso, int n){
   for(pref = preflist.begin(); pref != preflist.end(); ++pref){
       double avail = processing[ready()][*pref].quantity();
       double diff = need - avail;
-      if( need > 0 && need > avail ){
-        iso_source_buff.PushAll(processing[ready()][*pref].PopQty(avail));
-        need = diff;
-      } else if ( need > 0 && need <= avail ){
-        iso_source_buff.PushAll(processing[ready()][*pref].PopQty(need));
-        need = 0;
-      }
+      double to_pop = std::min(need, avail);
+      iso_source_buff.PushAll(processing[ready()][*pref].PopQty(to_pop));
+      need = std::max(diff,0.0);
   }
   return iso_source_buff;
 }
@@ -401,7 +397,7 @@ void StreamBlender::Blend_(cyclus::toolkit::ResourceBuff* fabbed_fuel_buff, int 
   using cyclus::Material;
   using cyclus::ResCast;
 
-  Material::Ptr souollapseBuff(fabbed_fuel_buff);
+  Material::Ptr soup = CollapseBuff(fabbed_fuel_buff);
 
   for( int i=0; i<n_poss; ++i){
     Material::Ptr goal_mat =  soup->ExtractComp(GoalCompMass_(), GoalComp_());
