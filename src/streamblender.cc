@@ -43,7 +43,7 @@ void StreamBlender::InitFrom(cyclus::QueryableBackend* b){
   Commodity commod = Commodity(out_commod);
   cyclus::toolkit::CommodityProducer::Add(commod);
   cyclus::toolkit::CommodityProducer::SetCapacity(commod, capacity);
-  cyclus::toolkit::CommodityProducer::SetCost(commod, capacity);
+  cyclus::toolkit::CommodityProducer::SetCost(commod, cost);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -54,7 +54,7 @@ void StreamBlender::EnterNotify() {
   Commodity commod = Commodity(out_commod);
   cyclus::toolkit::CommodityProducer::Add(commod);
   cyclus::toolkit::CommodityProducer::SetCapacity(commod, capacity);
-  cyclus::toolkit::CommodityProducer::SetCost(commod, capacity);
+  cyclus::toolkit::CommodityProducer::SetCost(commod, cost);
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -401,7 +401,7 @@ void StreamBlender::Blend_(cyclus::toolkit::ResourceBuff* fabbed_fuel_buff, int 
   using cyclus::Material;
   using cyclus::ResCast;
 
-  Material::Ptr soup = CollapseBuff(fabbed_fuel_buff);
+  Material::Ptr souollapseBuff(fabbed_fuel_buff);
 
   for( int i=0; i<n_poss; ++i){
     Material::Ptr goal_mat =  soup->ExtractComp(GoalCompMass_(), GoalComp_());

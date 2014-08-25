@@ -260,6 +260,11 @@ class StreamBlender :
                       "timestep (kg)."}
   double capacity; //should be nonnegative
 
+  #pragma cyclus var {"default": 0,\
+                      "tooltip":"cost per unit",\
+                      "doc":"cost per unit out_commod (kg)."}
+  double cost; //should be nonnegative
+
   #pragma cyclus var {"tooltip":"The isotopes of interest for stream blending",\
                       "doc":"This list can have repeated entries and should be "\
                       "matched to the sources list."}
