@@ -127,6 +127,11 @@ StreamBlender::GetMatlRequests() {
     std::vector<Request<Material>*> mutuals;
     for (it = sources.begin(); it != sources.end(); ++it) {
       mutuals.push_back(port->AddRequest(mat, this, *it)); 
+
+      LOG(cyclus::LEV_INFO5, "SBlend") << prototype()
+                                    << " requested"
+                                    << mat->quantity()
+                                    << " of " << *it;
     }
     port->AddMutualReqs(mutuals);
     ports.insert(port);
@@ -207,6 +212,7 @@ void StreamBlender::GetMatlTrades(
                                   << " just received an order"
                                   << " for " << it->amt
                                   << " of " << commodity;
+
   }
 
 }
