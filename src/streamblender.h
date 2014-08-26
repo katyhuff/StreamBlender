@@ -159,13 +159,17 @@ class StreamBlender :
   inline void capacity_(double c) { capacity = c; }
   inline double capacity_() const { return capacity; }
 
+  /// @brief the cost per unit of the out_commod
+  inline void cost_(double c) { cost = c; }
+  inline double cost_() const { return cost; }
+
   /// @brief the isotopes that are part of the goal recipe
   inline void isos_(std::vector<int> c) { isos = c; }
   inline std::vector<int> isos_() const { return isos; }
 
   /// @brief the source used to form the goal recipe
-  inline void sources_(std::set<std::string> c) { sources = c; }
-  inline std::set<std::string> sources_() const { return sources; }
+  inline void sources_(std::vector<std::string> c) { sources = c; }
+  inline std::vector<std::string> sources_() const { return sources; }
 
   /// @brief the incoming commodities
   inline void in_commods_(std::vector<std::string> m) { in_commods = m; }

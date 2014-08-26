@@ -31,6 +31,7 @@ class StreamBlenderTest : public ::testing::Test {
   int iso_1, iso_2, iso_3;
   std::string src_11, src_12, src_21, src_22, src_31;
   std::vector< std::string > ins, srcs;
+  std::vector< int > isos;
 
   int process_time;
   double capacity, max_inv_size, cost;

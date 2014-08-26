@@ -26,6 +26,9 @@ void StreamBlenderTest::InitParameters(){
   iso_1 = 92235;
   iso_2 = 94240;
   iso_3 = 95241;
+  isos.push_back(iso_1);
+  isos.push_back(iso_2);
+  isos.push_back(iso_3);
   src_11 = in_c1;
   src_12 = in_c2;
   src_21 = in_c1;
@@ -91,7 +94,7 @@ void StreamBlenderTest::SetUpStreamBlender(){
 void StreamBlenderTest::TestInitState(StreamBlender* fac){
   EXPECT_EQ(ins, fac->in_commods_());
   EXPECT_EQ(out_c1, fac->out_commod_());
-  EXPECT_EQ(in_recipes, fac->in_recipes_());
+  EXPECT_EQ(ins, fac->in_recipes_());
   EXPECT_EQ(out_c1, fac->out_recipe_());
   EXPECT_EQ(process_time, fac->process_time_());
   EXPECT_EQ(max_inv_size, fac->max_inv_size_());
