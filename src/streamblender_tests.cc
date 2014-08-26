@@ -83,6 +83,9 @@ void StreamBlenderTest::SetUpStreamBlender(){
   src_facility_->process_time_(process_time);
   src_facility_->max_inv_size_(max_inv_size);
   src_facility_->capacity_(capacity);
+  src_facility_->cost_(cost);
+  src_facility_->isos_(isos);
+  src_facility_->sources_(srcs);
 }
 
 void StreamBlenderTest::TestInitState(StreamBlender* fac){
