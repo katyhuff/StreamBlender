@@ -347,6 +347,11 @@ int StreamBlender::NPossible_(){
     double amt = it->second;
     double avail = AmtPossible_(processing[ready()],iso);
     int curr = int(std::floor(avail/amt));
+    LOG(cyclus::LEV_DEBUG3, "SBlend") << "StreamBlender " << prototype()
+                                    << " has " << avail 
+                                    << " of " << iso 
+                                    << ". Enough for " << curr 
+                                    << " recipes.";
     if(first_run){
       n_poss = curr;
       first_run = false;
@@ -355,6 +360,8 @@ int StreamBlender::NPossible_(){
       n_poss = (prev < curr)? prev : curr;
     }
   }
+
+  
   return n_poss;
 }
 
