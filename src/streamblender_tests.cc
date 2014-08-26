@@ -17,12 +17,20 @@ void StreamBlenderTest::TearDown() {
 
 void StreamBlenderTest::InitParameters(){
   in_c1 = "in_c1";
+  in_c2 = "in_c2";
+  in_c3 = "in_c3";
   out_c1 = "out_c1";
-  out_c2 = "out_c2";
-  out_c3 = "out_c3";
-  outs.push_back(out_c1);
-  outs.push_back(out_c2);
-  outs.push_back(out_c3);
+  ins.push_back(in_c1);
+  ins.push_back(in_c2);
+  ins.push_back(in_c3);
+  iso_1 = 92235;
+  iso_2 = 94240;
+  iso_3 = 95241;
+  src_11 = in_c1;
+  src_12 = in_c2;
+  src_21 = in_c1;
+  src_22 = in_c2;
+  src_31 = in_c3;
   process_time = 10;
   max_inv_size = 200;
   capacity = 20;
@@ -31,8 +39,8 @@ void StreamBlenderTest::InitParameters(){
 }
 
 void StreamBlenderTest::SetUpStreamBlender(){
-  src_facility_->in_commod_(in_c1);
-  src_facility_->out_commods_(outs);
+  src_facility_->in_commods_(ins);
+  src_facility_->out_commod_(out_c1);
   src_facility_->process_time_(process_time);
   src_facility_->max_inv_size_(max_inv_size);
   src_facility_->capacity_(capacity);
@@ -42,8 +50,8 @@ void StreamBlenderTest::TestInitState(StreamBlender* fac){
   EXPECT_EQ(process_time, fac->process_time_());
   EXPECT_EQ(max_inv_size, fac->max_inv_size_());
   EXPECT_EQ(capacity, fac->capacity_());
-  EXPECT_EQ(outs, fac->out_commods_());
-  EXPECT_EQ(in_c1, fac->in_commod_());
+  EXPECT_EQ(ins, fac->in_commods_());
+  EXPECT_EQ(out_c1, fac->out_commod_());
 }
 
 void StreamBlenderTest::TestRequest(StreamBlender* fac, double cap){

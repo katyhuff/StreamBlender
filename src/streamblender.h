@@ -147,6 +147,41 @@ class StreamBlender :
   /* --- StreamBlender Members --- */
 
   /* --- */
+  /// @brief the processing time required for a full process
+  inline void process_time_(int t) { process_time = t; }
+  inline int process_time_() const { return process_time; }
+
+  /// @brief the maximum amount allowed in rawbuffs
+  inline void max_inv_size_(double m) { max_inv_size = m; }
+  inline double max_inv_size_() const { return max_inv_size; }
+
+  /// @brief the maximum amount allowed in rawbuffs
+  inline void capacity_(double c) { capacity = c; }
+  inline double capacity_() const { return capacity; }
+
+  /// @brief the incoming commodities
+  inline void in_commods_(std::vector<std::string> m) { in_commods = m; }
+  inline std::vector< std::string > in_commods_() const {return in_commods;};
+
+  /// @brief the outgoing goal commodity
+  inline void out_commod_(std::string m) { out_commod = m; }
+  inline std::string out_commod_() const {return out_commod;};
+
+  /// @brief the incoming recipes (one per in_commod)
+  inline void in_recipes_(std::vector<std::string> m) { in_recipes = m; }
+  inline std::vector< std::string > in_recipes_() const {return in_recipes;};
+
+  /// @brief the outgoing goal recipe
+  inline void out_recipe_(std::string m) { out_recipe = m; }
+  inline std::string out_recipe_() const {return out_recipe;};
+
+  /// @brief current maximum amount that can be added to processing
+  inline double current_capacity() const {
+    return (max_inv_size - blendbuff.quantity()); } 
+  
+  /// @brief returns the time key for ready materials
+  int ready(){ return context()->time() - process_time ; }
+
 
  protected:
   /// @brief adds a material into the incoming commodity rawbuffs
@@ -228,29 +263,22 @@ class StreamBlender :
     return crctx_;
   }
 
-  /// @brief returns the time key for ready materials
-  int ready(){ return context()->time() - process_time ; }
-
   /* --- Module Members --- */
   #pragma cyclus var {"tooltip":"input commodities",\
                       "doc":"list of commodities accepted by this facility"}
   std::vector< std::string > in_commods;
-  inline std::vector< std::string > in_commods_() const {return in_commods;};
 
   #pragma cyclus var {"tooltip":"output commodity",\
                       "doc":"commodity produced by this facility"}
   std::string out_commod;
-  inline std::string out_commod_() const {return out_commod;};
 
   #pragma cyclus var {"tooltip":"input recipes",\
                       "doc":"a list of recipes accepted by this facility"}
   std::vector< std::string > in_recipes;
-  inline std::vector< std::string > in_recipes_() const {return in_recipes;};
 
   #pragma cyclus var {"tooltip":"output recipe",\
                       "doc":"recipe produced by this facility"}
   std::string out_recipe;
-  inline std::string out_recipe_() const {return out_recipe;};
 
   #pragma cyclus var {"default": 0,\
                       "tooltip":"process time (timesteps)",\
@@ -298,22 +326,6 @@ class StreamBlender :
 
   cyclus::toolkit::CommodityRecipeContext crctx_;
 
-  /// @brief the processing time required for a full process
-  inline void process_time_(int t) { process_time = t; }
-  inline int process_time_() const { return process_time; }
-
-  /// @brief the maximum amount allowed in rawbuffs
-  inline void max_inv_size_(double m) { max_inv_size = m; }
-  inline double max_inv_size_() const { return max_inv_size; }
-
-  /// @brief the maximum amount allowed in rawbuffs
-  inline void capacity_(double c) { capacity = c; }
-  inline double capacity_() const { return capacity; }
-
-  /// @brief current maximum amount that can be added to processing
-  inline double current_capacity() const {
-    return (max_inv_size - blendbuff.quantity()); } 
-  
   friend class StreamBlenderTest;
 };
 
