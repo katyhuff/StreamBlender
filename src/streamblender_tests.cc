@@ -31,16 +31,55 @@ void StreamBlenderTest::InitParameters(){
   src_21 = in_c1;
   src_22 = in_c2;
   src_31 = in_c3;
+  srcs.push_back(src_11);
+  srcs.push_back(src_12);
+  srcs.push_back(src_21);
+  srcs.push_back(src_22);
+  srcs.push_back(src_31);
   process_time = 10;
   max_inv_size = 200;
   capacity = 20;
   cost = 1;
 
+  cyclus::CompMap v;
+  v[922350000] = 1;
+  v[922380000] = 2;
+  cyclus::Composition::Ptr recipe = cyclus::Composition::CreateFromAtom(v);
+  tc_.get()->AddRecipe(src_11, recipe);
+
+  cyclus::CompMap w;
+  w[922350000] = 1;
+  recipe = cyclus::Composition::CreateFromAtom(w);
+  tc_.get()->AddRecipe(src_12, recipe);
+
+  w[942400000] = 1;
+  recipe = cyclus::Composition::CreateFromAtom(w);
+  tc_.get()->AddRecipe(src_21, recipe);
+
+  v[942400000] = 1;
+  recipe = cyclus::Composition::CreateFromAtom(v);
+  tc_.get()->AddRecipe(src_22, recipe);
+
+  cyclus::CompMap x;
+  x[952410000] = 0.25;
+  recipe = cyclus::Composition::CreateFromAtom(x);
+  tc_.get()->AddRecipe(src_31, recipe);
+
+  cyclus::CompMap y;
+  y[922350000] = 1;
+  y[942400000] = 2;
+  y[952410000] = 1;
+  recipe = cyclus::Composition::CreateFromAtom(y);
+  tc_.get()->AddRecipe(out_r1, recipe);
 }
+
+
 
 void StreamBlenderTest::SetUpStreamBlender(){
   src_facility_->in_commods_(ins);
   src_facility_->out_commod_(out_c1);
+  src_facility_->in_recipes_(srcs);
+  src_facility_->out_recipe_(out_r1);
   src_facility_->process_time_(process_time);
   src_facility_->max_inv_size_(max_inv_size);
   src_facility_->capacity_(capacity);
