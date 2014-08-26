@@ -89,11 +89,17 @@ void StreamBlenderTest::SetUpStreamBlender(){
 }
 
 void StreamBlenderTest::TestInitState(StreamBlender* fac){
+  EXPECT_EQ(ins, fac->in_commods_());
+  EXPECT_EQ(out_c1, fac->out_commod_());
+  EXPECT_EQ(in_recipes, fac->in_recipes_());
+  EXPECT_EQ(out_c1, fac->out_recipe_());
   EXPECT_EQ(process_time, fac->process_time_());
   EXPECT_EQ(max_inv_size, fac->max_inv_size_());
   EXPECT_EQ(capacity, fac->capacity_());
-  EXPECT_EQ(ins, fac->in_commods_());
-  EXPECT_EQ(out_c1, fac->out_commod_());
+  EXPECT_EQ(cost, fac->cost_());
+  EXPECT_EQ(isos, fac->isos_());
+  EXPECT_EQ(srcs, fac->sources_());
+
 }
 
 void StreamBlenderTest::TestRequest(StreamBlender* fac, double cap){
