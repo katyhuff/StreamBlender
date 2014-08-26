@@ -31,6 +31,7 @@ void StreamBlender::InitFrom(StreamBlender* m) {
 
   #pragma cyclus impl initfromcopy streamblender::StreamBlender
 
+  prefs_=Prefs_();
   cyclus::toolkit::CommodityProducer::Copy(m);
 }
 
@@ -39,6 +40,7 @@ void StreamBlender::InitFrom(cyclus::QueryableBackend* b){
 
   #pragma cyclus impl initfromdb streamblender::StreamBlender
 
+  prefs_=Prefs_();
   using cyclus::toolkit::Commodity;
   Commodity commod = Commodity(out_commod);
   cyclus::toolkit::CommodityProducer::Add(commod);
@@ -157,17 +159,7 @@ void StreamBlender::AcceptMatlTrades(
   for (trade = responses.begin(); trade != responses.end(); ++trade) {
     commod = trade->first.request->commodity();
     mat = trade->second;
-    if (mat_commods.count(commod) == 0) {
-      mat_commods[commod] = mat;
-    } else {
-      mat_commods[commod]->Absorb(mat);
-    }
-  }
-
-  // add each blob to reserves
-  std::map<std::string, Material::Ptr>::iterator it;
-  for (it = mat_commods.begin(); it != mat_commods.end(); ++it) {
-    AddMat_(it->first, it->second);
+    AddMat_(commod, mat);
   }
 }
 
@@ -325,10 +317,13 @@ void StreamBlender::BeginProcessing_(){
 cyclus::toolkit::ResourceBuff StreamBlender::MeetNeed_(int iso, int n){
   using cyclus::toolkit::ResourceBuff;
 
+  LOG(cyclus::LEV_DEBUG2, "SBlend") << "StreamBlender " << prototype()
+                                  << " is meeting a need for iso: " << iso;
+
   ResourceBuff iso_source_buff =  ResourceBuff();
   double need = n*GoalCompMap_()[iso];
   std::set<std::string>::const_iterator pref;
-  std::set<std::string> preflist = prefs(iso);
+  std::set<std::string> preflist = prefs(iso/10000);
   for(pref = preflist.begin(); pref != preflist.end(); ++pref){
       double avail = processing[ready()][*pref].quantity();
       double diff = need - avail;
@@ -350,17 +345,7 @@ int StreamBlender::NPossible_(){
   for(it = goal.begin(); it != goal.end(); ++it){
     int iso = it->first;
     double amt = it->second;
-    double avail = 0;
-    std::set<std::string>::const_iterator pref;
-    std::set<std::string> preflist = prefs(iso);
-    for(pref = preflist.begin(); pref != preflist.end(); ++pref){
-      std::map< std::string, cyclus::toolkit::ResourceBuff >::iterator found;
-      found = processing[ready()].find(*pref);
-      bool isfound = (found!=processing[ready()].end());
-      if(isfound){
-        avail += processing[ready()][*pref].quantity();
-      }
-    }
+    double avail = AmtPossible_(processing[ready()],iso);
     int curr = int(std::floor(avail/amt));
     if(first_run){
       n_poss = curr;
@@ -371,6 +356,38 @@ int StreamBlender::NPossible_(){
     }
   }
   return n_poss;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double StreamBlender::AmtPossible_(std::map< std::string, 
+    cyclus::toolkit::ResourceBuff> source_buffs, int iso) {
+  using cyclus::toolkit::ResourceBuff;
+
+  double avail = 0;
+
+  std::map< std::string, ResourceBuff >::iterator it;
+  for( it = source_buffs.begin(); it != source_buffs.end(); ++it){
+    avail += AmtPossible_(&(it->second), iso);
+  }
+  return avail;
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+double StreamBlender::AmtPossible_(cyclus::toolkit::ResourceBuff* buff, int iso) {
+  using cyclus::toolkit::MatQuery;
+  using cyclus::toolkit::ResourceBuff;
+  using cyclus::ResCast;
+  using cyclus::Material;
+
+  double avail = 0;
+  int n = buff->count();
+  for(int i = 0; i < n; ++i) {
+    Material::Ptr front = ResCast<Material>(buff->Pop(ResourceBuff::FRONT));
+    MatQuery mq = MatQuery(front);
+    avail += mq.mass(iso);
+    buff->Push(front);
+  }
+  return avail;
 }
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -469,6 +486,9 @@ std::set<std::string> StreamBlender::Sources_(int iso){
   std::set<int>::const_iterator idx;
   for(idx = idxs.begin(); idx !=idxs.end(); ++idx){
     to_ret.insert(sources[*idx]);
+    LOG(cyclus::LEV_DEBUG3, "SBlend") << "StreamBlender " << prototype() 
+                                     << " is matching iso: " << iso
+                                     << " with source: " << sources[*idx];
   }
   return to_ret;
 }
@@ -480,6 +500,9 @@ std::map<int, std::set<std::string> > StreamBlender::Prefs_(){
   for( iso = isos.begin(); iso != isos.end(); ++iso) {
     if( to_ret.count(*iso) == 0 ){
       to_ret.insert(std::make_pair(*iso, Sources_(*iso)));
+      LOG(cyclus::LEV_DEBUG3, "SBlend") << "StreamBlender " << prototype() 
+                                     << " has matched iso: " << *iso
+                                     << " with sources";
     }
   } 
   return to_ret;

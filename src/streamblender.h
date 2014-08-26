@@ -34,8 +34,6 @@ namespace streamblender {
 /// Place a description of the required input parameters which define the
 /// agent implementation.
 ///   #. process_time_ : the number of timesteps a conversion process takes <0>
-///   #. refuel_time : the number of timesteps required to reload the processing after
-///   a process has finished <0>
 ///
 /// The StreamBlender also maintains a cyclus::CommodityRecipeContext, which
 /// allows it to track incommodity-inrecipe/outcommodity-outrecipe groupings.
@@ -175,6 +173,17 @@ class StreamBlender :
 
   /// @brief number of possible goal recipes based on the available material
   int NPossible_();
+
+  /// @brief amount of iso available in this map of buffers
+  /// @param source_buffs map of commodities-resourcebuffers that holds source mats
+  /// @param iso the isotope for which to find availability 
+  double AmtPossible_(std::map< std::string, cyclus::toolkit::ResourceBuff > 
+    source_buffs, int iso );
+
+  /// @brief amount of iso available in this buffer
+  /// @param buff a resourcebuffer that holds source mats
+  /// @param iso the isotope for which to find availability 
+  double AmtPossible_(cyclus::toolkit::ResourceBuff* buff, int iso );
 
   /// @brief collapse a resourcebuff into a single material
   cyclus::Material::Ptr CollapseBuff(cyclus::toolkit::ResourceBuff* to_collapse);
