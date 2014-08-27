@@ -189,7 +189,7 @@ class StreamBlender :
 
   /// @brief current maximum amount that can be added to processing
   inline double current_capacity() const {
-    return (max_inv_size - blendbuff.quantity()); } 
+    return (std::min(capacity, max_inv_size - blendbuff.quantity())); } 
   
   /// @brief returns the time key for ready materials
   int ready(){ return context()->time() - process_time ; }
