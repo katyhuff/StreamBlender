@@ -20,6 +20,7 @@ void StreamBlenderTest::InitParameters(){
   in_c2 = "in_c2";
   in_c3 = "in_c3";
   out_c1 = "out_c1";
+  out_r1 = "out_r1";
   ins.push_back(in_c1);
   ins.push_back(in_c2);
   ins.push_back(in_c3);
@@ -94,8 +95,8 @@ void StreamBlenderTest::SetUpStreamBlender(){
 void StreamBlenderTest::TestInitState(StreamBlender* fac){
   EXPECT_EQ(ins, fac->in_commods_());
   EXPECT_EQ(out_c1, fac->out_commod_());
-  EXPECT_EQ(ins, fac->in_recipes_());
-  EXPECT_EQ(out_c1, fac->out_recipe_());
+  EXPECT_EQ(srcs, fac->in_recipes_());
+  EXPECT_EQ(out_r1, fac->out_recipe_());
   EXPECT_EQ(process_time, fac->process_time_());
   EXPECT_EQ(max_inv_size, fac->max_inv_size_());
   EXPECT_EQ(capacity, fac->capacity_());

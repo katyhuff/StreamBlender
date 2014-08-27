@@ -276,11 +276,13 @@ class StreamBlender :
   }
 
   /* --- Module Members --- */
+
   #pragma cyclus var {"tooltip":"input commodities",\
                       "doc":"list of commodities accepted by this facility"}
   std::vector< std::string > in_commods;
 
-  #pragma cyclus var {"tooltip":"output commodity",\
+  #pragma cyclus var {"default":"",\
+                       "tooltip":"output commodity",\
                       "doc":"commodity produced by this facility"}
   std::string out_commod;
 
@@ -288,31 +290,32 @@ class StreamBlender :
                       "doc":"a list of recipes accepted by this facility"}
   std::vector< std::string > in_recipes;
 
-  #pragma cyclus var {"tooltip":"output recipe",\
+  #pragma cyclus var {"default":"",\
+                      "tooltip":"output recipe",\
                       "doc":"recipe produced by this facility"}
   std::string out_recipe;
 
   #pragma cyclus var {"default": 0,\
                       "tooltip":"process time (timesteps)",\
                       "doc":"the time it takes to convert a received commodity (timesteps)."}
-  int process_time; //should be nonnegative
+  int process_time; 
 
   #pragma cyclus var {"default": 1e299,\
                       "tooltip":"maximum rawbuffs size (kg)",\
                       "doc":"the amount of material that can be in storage at "\
                       "one time (kg)."}
-  double max_inv_size; //should be nonnegative
+  double max_inv_size; 
 
   #pragma cyclus var {"default": 1e299,\
                       "tooltip":"maximum processing rate (kg)",\
                       "doc":"the amount of material that can be processed per "\
                       "timestep (kg)."}
-  double capacity; //should be nonnegative
+  double capacity;
 
   #pragma cyclus var {"default": 0,\
                       "tooltip":"cost per unit",\
                       "doc":"cost per unit out_commod (kg)."}
-  double cost; //should be nonnegative
+  double cost;
 
   #pragma cyclus var {"tooltip":"The isotopes of interest for stream blending",\
                       "doc":"This list can have repeated entries and should be "\
